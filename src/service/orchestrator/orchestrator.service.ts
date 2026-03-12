@@ -1,7 +1,7 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { DagService } from 'src/dag/dag.service';
+import { DagService } from 'src/service/dag/dag.service';
 import { workflowGraph } from 'src/types/types';
 import Redis from 'ioredis';
 @Injectable()

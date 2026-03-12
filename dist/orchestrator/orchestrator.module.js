@@ -10,7 +10,7 @@ exports.OrchestratorModule = void 0;
 const common_1 = require("@nestjs/common");
 const orchestrator_service_1 = require("./orchestrator.service");
 const orchestrator_controller_1 = require("./orchestrator.controller");
-const dag_module_1 = require("../dag/dag.module");
+const dag_module_1 = require("../service/dag/dag.module");
 const bullmq_1 = require("@nestjs/bullmq");
 let OrchestratorModule = class OrchestratorModule {
 };

@@ -19,8 +19,8 @@ const execution_entity_1 = require("../../database/entities/execution.entity");
 const typeorm_2 = require("typeorm");
 const workflow_service_1 = require("../workflow/workflow.service");
 const agent_execution_entity_1 = require("../../database/entities/agent-execution.entity");
-const orchestrator_service_1 = require("../../orchestrator/orchestrator.service");
-const dag_service_1 = require("../../dag/dag.service");
+const orchestrator_service_1 = require("../../service/orchestrator/orchestrator.service");
+const dag_service_1 = require("../../service/dag/dag.service");
 let ExecutionService = class ExecutionService {
     executionRepository;
     workflowService;

@@ -16,7 +16,7 @@ exports.OrchestratorService = void 0;
 const bullmq_1 = require("@nestjs/bullmq");
 const common_1 = require("@nestjs/common");
 const bullmq_2 = require("bullmq");
-const dag_service_1 = require("../dag/dag.service");
+const dag_service_1 = require("../service/dag/dag.service");
 const ioredis_1 = require("ioredis");
 let OrchestratorService = class OrchestratorService {
     dagService;

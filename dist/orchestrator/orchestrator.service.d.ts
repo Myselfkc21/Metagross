@@ -1,5 +1,5 @@
 import { Queue } from 'bullmq';
-import { DagService } from 'src/dag/dag.service';
+import { DagService } from 'src/service/dag/dag.service';
 import { workflowGraph } from 'src/types/types';
 export declare class OrchestratorService {
     private readonly dagService;
