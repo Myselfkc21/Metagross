@@ -19,7 +19,7 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import { join } from 'path';
-
+import { BullModule } from '@nestjs/bullmq';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -36,6 +36,12 @@ import { join } from 'path';
         AcceptLanguageResolver,
         GraphQLWebsocketResolver,
       ],
+      // BullModule.forRoot({
+      // connection: {
+      //   host: 'localhost',
+      //   port: 6379,
+      // },
+      // }),
     }),
     WorkflowModule,
     ExecutionModule,

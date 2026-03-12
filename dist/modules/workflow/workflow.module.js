@@ -20,6 +20,7 @@ exports.WorkflowModule = WorkflowModule = __decorate([
         imports: [typeorm_1.TypeOrmModule.forFeature([workflow_entity_1.Workflow])],
         controllers: [workflow_controller_1.WorkflowController],
         providers: [workflow_service_1.WorkflowService],
+        exports: [workflow_service_1.WorkflowService],
     })
 ], WorkflowModule);
 //# sourceMappingURL=workflow.module.js.map

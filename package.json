@@ -23,6 +23,7 @@
     "migration:run": "npx typeorm-ts-node-commonjs migration:run -d src/config/typeorm.config.ts"
   },
   "dependencies": {
+    "@nestjs/bullmq": "^11.0.4",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
@@ -32,6 +33,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@openrouter/sdk": "^0.9.11",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.71.0",
     "config": "^4.4.1",
     "luxon": "^3.7.2",
     "mysql2": "^3.19.1",
