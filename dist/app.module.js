@@ -10,7 +10,6 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
-const openai_service_1 = require("./service/openai.service");
 const workflow_module_1 = require("./modules/workflow/workflow.module");
 const execution_module_1 = require("./modules/execution/execution.module");
 const orchestrator_module_1 = require("./orchestrator/orchestrator.module");
@@ -22,12 +21,19 @@ const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
 const nestjs_i18n_1 = require("nestjs-i18n");
 const path_1 = require("path");
+const bullmq_1 = require("@nestjs/bullmq");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            bullmq_1.BullModule.forRoot({
+                connection: {
+                    host: 'localhost',
+                    port: 6379,
+                },
+            }),
             config_1.ConfigModule.forRoot({ isGlobal: true }),
             typeorm_1.TypeOrmModule.forRoot(typeorm_config_1.typeormConfig),
             nestjs_i18n_1.I18nModule.forRoot({
@@ -51,7 +57,7 @@ exports.AppModule = AppModule = __decorate([
             stream_module_1.StreamModule,
         ],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, openai_service_1.OpenaiService],
+        providers: [app_service_1.AppService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

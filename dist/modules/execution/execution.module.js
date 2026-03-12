@@ -14,6 +14,8 @@ const typeorm_1 = require("@nestjs/typeorm");
 const execution_entity_1 = require("../../database/entities/execution.entity");
 const workflow_module_1 = require("../workflow/workflow.module");
 const agent_execution_entity_1 = require("../../database/entities/agent-execution.entity");
+const dag_module_1 = require("../../dag/dag.module");
+const orchestrator_module_1 = require("../../orchestrator/orchestrator.module");
 let ExecutionModule = class ExecutionModule {
 };
 exports.ExecutionModule = ExecutionModule;
@@ -22,6 +24,8 @@ exports.ExecutionModule = ExecutionModule = __decorate([
         imports: [
             typeorm_1.TypeOrmModule.forFeature([execution_entity_1.Execution, agent_execution_entity_1.AgentExecution]),
             workflow_module_1.WorkflowModule,
+            dag_module_1.DagModule,
+            orchestrator_module_1.OrchestratorModule,
         ],
         controllers: [execution_controller_1.ExecutionController],
         providers: [execution_service_1.ExecutionService],

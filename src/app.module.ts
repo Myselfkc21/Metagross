@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { OpenaiService } from './service/openai.service';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { ExecutionModule } from './modules/execution/execution.module';
 import { OrchestratorModule } from './orchestrator/orchestrator.module';
@@ -20,8 +19,15 @@ import {
 } from 'nestjs-i18n';
 import { join } from 'path';
 import { BullModule } from '@nestjs/bullmq';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 @Module({
   imports: [
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot(typeormConfig),
     I18nModule.forRoot({
@@ -36,13 +42,8 @@ import { BullModule } from '@nestjs/bullmq';
         AcceptLanguageResolver,
         GraphQLWebsocketResolver,
       ],
-      // BullModule.forRoot({
-      // connection: {
-      //   host: 'localhost',
-      //   port: 6379,
-      // },
-      // }),
     }),
+
     WorkflowModule,
     ExecutionModule,
     OrchestratorModule,
@@ -51,6 +52,6 @@ import { BullModule } from '@nestjs/bullmq';
     StreamModule,
   ],
   controllers: [AppController],
-  providers: [AppService, OpenaiService],
+  providers: [AppService],
 })
 export class AppModule {}

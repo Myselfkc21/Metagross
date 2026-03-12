@@ -19,14 +19,20 @@ const execution_entity_1 = require("../../database/entities/execution.entity");
 const typeorm_2 = require("typeorm");
 const workflow_service_1 = require("../workflow/workflow.service");
 const agent_execution_entity_1 = require("../../database/entities/agent-execution.entity");
+const orchestrator_service_1 = require("../../orchestrator/orchestrator.service");
+const dag_service_1 = require("../../dag/dag.service");
 let ExecutionService = class ExecutionService {
     executionRepository;
     workflowService;
     agentExecutionRepository;
-    constructor(executionRepository, workflowService, agentExecutionRepository) {
+    orchestratorService;
+    dagService;
+    constructor(executionRepository, workflowService, agentExecutionRepository, orchestratorService, dagService) {
         this.executionRepository = executionRepository;
         this.workflowService = workflowService;
         this.agentExecutionRepository = agentExecutionRepository;
+        this.orchestratorService = orchestratorService;
+        this.dagService = dagService;
     }
     async createExecution(executiondto) {
         const { workflowId, input } = executiondto;
@@ -65,6 +71,8 @@ exports.ExecutionService = ExecutionService = __decorate([
     __param(2, (0, typeorm_1.InjectRepository)(agent_execution_entity_1.AgentExecution)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         workflow_service_1.WorkflowService,
-        typeorm_2.Repository])
+        typeorm_2.Repository,
+        orchestrator_service_1.OrchestratorService,
+        dag_service_1.DagService])
 ], ExecutionService);
 //# sourceMappingURL=execution.service.js.map
