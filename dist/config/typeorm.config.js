@@ -13,14 +13,13 @@ exports.typeormConfig = {
     port: process.env.DATABASE_PORT,
     synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
     logging: process.env.DATABASE_LOGGING === 'true',
-    entities: ['**/*.entity.ts'],
-    migrations: ['src/database/migrations/*-migration.ts'],
     migrationsTableName: 'migrations',
     autoLoadEntities: true,
-    cli: {
-        migrationsDir: 'src/database/migrations',
-    },
 };
 console.log('typeormConfig', exports.typeormConfig);
-exports.default = new typeorm_1.DataSource(exports.typeormConfig);
+exports.default = new typeorm_1.DataSource({
+    ...exports.typeormConfig,
+    entities: ['src/database/entities/*.entity.ts'],
+    migrations: ['src/database/migrations/*.ts'],
+});
 //# sourceMappingURL=typeorm.config.js.map

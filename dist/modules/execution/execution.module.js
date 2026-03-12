@@ -10,11 +10,14 @@ exports.ExecutionModule = void 0;
 const common_1 = require("@nestjs/common");
 const execution_service_1 = require("./execution.service");
 const execution_controller_1 = require("./execution.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const execution_entity_1 = require("../../database/entities/execution.entity");
 let ExecutionModule = class ExecutionModule {
 };
 exports.ExecutionModule = ExecutionModule;
 exports.ExecutionModule = ExecutionModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([execution_entity_1.Execution])],
         controllers: [execution_controller_1.ExecutionController],
         providers: [execution_service_1.ExecutionService],
     })

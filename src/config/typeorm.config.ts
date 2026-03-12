@@ -10,14 +10,13 @@ export const typeormConfig = {
   port: process.env.DATABASE_PORT,
   synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
   logging: process.env.DATABASE_LOGGING === 'true',
-  entities: ['**/*.entity.ts'],
-  migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'migrations',
   autoLoadEntities: true,
-  cli: {
-    migrationsDir: 'src/database/migrations',
-  },
 };
 
 console.log('typeormConfig', typeormConfig);
-export default new DataSource(typeormConfig);
+export default new DataSource({
+  ...typeormConfig,
+  entities: ['src/database/entities/*.entity.ts'],
+  migrations: ['src/database/migrations/*.ts'],
+});
