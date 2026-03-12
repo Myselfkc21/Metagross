@@ -9,6 +9,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrchestratorService = void 0;
 const common_1 = require("@nestjs/common");
 let OrchestratorService = class OrchestratorService {
+    startInitialAgents() {
+    }
 };
 exports.OrchestratorService = OrchestratorService;
 exports.OrchestratorService = OrchestratorService = __decorate([

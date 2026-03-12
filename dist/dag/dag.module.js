@@ -9,13 +9,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DagModule = void 0;
 const common_1 = require("@nestjs/common");
 const dag_service_1 = require("./dag.service");
-const dag_controller_1 = require("./dag.controller");
 let DagModule = class DagModule {
 };
 exports.DagModule = DagModule;
 exports.DagModule = DagModule = __decorate([
     (0, common_1.Module)({
-        controllers: [dag_controller_1.DagController],
         providers: [dag_service_1.DagService],
     })
 ], DagModule);

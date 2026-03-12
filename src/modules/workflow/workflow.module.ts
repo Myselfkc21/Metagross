@@ -8,5 +8,6 @@ import { Workflow } from 'src/database/entities/workflow.entity';
   imports: [TypeOrmModule.forFeature([Workflow])],
   controllers: [WorkflowController],
   providers: [WorkflowService],
+  exports: [WorkflowService],
 })
 export class WorkflowModule {}

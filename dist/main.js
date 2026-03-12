@@ -19,6 +19,7 @@ async function bootstrap() {
     app.useGlobalPipes(new common_1.ValidationPipe({ transform: true }));
     app.useGlobalInterceptors(new common_1.ClassSerializerInterceptor(app.get(core_1.Reflector)));
     await app.listen(process.env.PORT ?? 3000);
+    console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
