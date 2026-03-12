@@ -10,11 +10,14 @@ exports.WorkflowModule = void 0;
 const common_1 = require("@nestjs/common");
 const workflow_service_1 = require("./workflow.service");
 const workflow_controller_1 = require("./workflow.controller");
+const typeorm_1 = require("@nestjs/typeorm");
+const workflow_entity_1 = require("../../database/entities/workflow.entity");
 let WorkflowModule = class WorkflowModule {
 };
 exports.WorkflowModule = WorkflowModule;
 exports.WorkflowModule = WorkflowModule = __decorate([
     (0, common_1.Module)({
+        imports: [typeorm_1.TypeOrmModule.forFeature([workflow_entity_1.Workflow])],
         controllers: [workflow_controller_1.WorkflowController],
         providers: [workflow_service_1.WorkflowService],
     })

@@ -9,12 +9,14 @@ class migration1773161360923 {
             columns: [
                 {
                     name: 'id',
-                    type: 'varchar',
+                    type: 'int',
                     isPrimary: true,
+                    isGenerated: true,
+                    generationStrategy: 'increment',
                 },
                 {
                     name: 'workflow_id',
-                    type: 'varchar',
+                    type: 'int',
                     isNullable: false,
                 },
                 {
