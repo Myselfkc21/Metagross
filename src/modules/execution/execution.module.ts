@@ -5,11 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Execution } from 'src/database/entities/execution.entity';
 import { WorkflowModule } from '../workflow/workflow.module';
 import { AgentExecution } from 'src/database/entities/agent-execution.entity';
+import { DagModule } from 'src/dag/dag.module';
+import { OrchestratorModule } from 'src/orchestrator/orchestrator.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Execution, AgentExecution]),
     WorkflowModule,
+    DagModule,
+    OrchestratorModule,
   ],
   controllers: [ExecutionController],
   providers: [ExecutionService],

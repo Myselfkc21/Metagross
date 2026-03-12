@@ -15,6 +15,7 @@ exports.DagModule = DagModule;
 exports.DagModule = DagModule = __decorate([
     (0, common_1.Module)({
         providers: [dag_service_1.DagService],
+        exports: [dag_service_1.DagService],
     })
 ], DagModule);
 //# sourceMappingURL=dag.module.js.map
