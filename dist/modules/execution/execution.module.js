@@ -14,8 +14,8 @@ const typeorm_1 = require("@nestjs/typeorm");
 const execution_entity_1 = require("../../database/entities/execution.entity");
 const workflow_module_1 = require("../workflow/workflow.module");
 const agent_execution_entity_1 = require("../../database/entities/agent-execution.entity");
-const dag_module_1 = require("../../dag/dag.module");
-const orchestrator_module_1 = require("../../orchestrator/orchestrator.module");
+const dag_module_1 = require("../../service/dag/dag.module");
+const orchestrator_module_1 = require("../../service/orchestrator/orchestrator.module");
 let ExecutionModule = class ExecutionModule {
 };
 exports.ExecutionModule = ExecutionModule;

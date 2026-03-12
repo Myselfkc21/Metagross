@@ -3,8 +3,8 @@ import { Repository } from 'typeorm';
 import { createExecutionDto } from './dto/create-execution.dto';
 import { WorkflowService } from '../workflow/workflow.service';
 import { AgentExecution } from 'src/database/entities/agent-execution.entity';
-import { OrchestratorService } from 'src/orchestrator/orchestrator.service';
-import { DagService } from 'src/dag/dag.service';
+import { OrchestratorService } from 'src/service/orchestrator/orchestrator.service';
+import { DagService } from 'src/service/dag/dag.service';
 export declare class ExecutionService {
     private readonly executionRepository;
     private readonly workflowService;

@@ -9,7 +9,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AgentModule = void 0;
 const common_1 = require("@nestjs/common");
 const agent_service_1 = require("./agent.service");
-const agent_controller_1 = require("./agent.controller");
 const typeorm_1 = require("@nestjs/typeorm");
 const agent_execution_entity_1 = require("../database/entities/agent-execution.entity");
 let AgentModule = class AgentModule {
@@ -18,7 +17,6 @@ exports.AgentModule = AgentModule;
 exports.AgentModule = AgentModule = __decorate([
     (0, common_1.Module)({
         imports: [typeorm_1.TypeOrmModule.forFeature([agent_execution_entity_1.AgentExecution])],
-        controllers: [agent_controller_1.AgentController],
         providers: [agent_service_1.AgentService],
     })
 ], AgentModule);
