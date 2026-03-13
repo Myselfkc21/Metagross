@@ -22,6 +22,7 @@ const config_1 = require("@nestjs/config");
 const nestjs_i18n_1 = require("nestjs-i18n");
 const path_1 = require("path");
 const bullmq_1 = require("@nestjs/bullmq");
+const agentconsumer_module_1 = require("./queue/agentconsumer/agentconsumer.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -55,6 +56,7 @@ exports.AppModule = AppModule = __decorate([
             dag_module_1.DagModule,
             agent_module_1.AgentModule,
             stream_module_1.StreamModule,
+            agentconsumer_module_1.AgentConsumerModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

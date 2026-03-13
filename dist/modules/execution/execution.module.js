@@ -25,10 +25,11 @@ exports.ExecutionModule = ExecutionModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([execution_entity_1.Execution, agent_execution_entity_1.AgentExecution]),
             workflow_module_1.WorkflowModule,
             dag_module_1.DagModule,
-            orchestrator_module_1.OrchestratorModule,
+            (0, common_1.forwardRef)(() => orchestrator_module_1.OrchestratorModule),
         ],
         controllers: [execution_controller_1.ExecutionController],
         providers: [execution_service_1.ExecutionService],
+        exports: [execution_service_1.ExecutionService],
     })
 ], ExecutionModule);
 //# sourceMappingURL=execution.module.js.map

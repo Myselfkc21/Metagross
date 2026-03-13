@@ -2,12 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { OpenRouter } from '@openrouter/sdk';
 import { ToolDefinitionJson } from '@openrouter/sdk/esm/models';
 import { workflowGraph } from 'src/types/types';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 @Injectable()
 export class AgentService {
-  private openRouter = new OpenRouter({
-    apiKey: process.env.OPENROUTER_API_KEY || '',
-  });
+  private openRouter: OpenRouter;
+  constructor() {
+    console.log(
+      'Initializing AgentService with OPENROUTER_API_KEY:',
+      process.env.OPENROUTER_API_KEY,
+    );
+    this.openRouter = new OpenRouter({
+      apiKey: process.env.OPENAI_API_KEY || '',
+    });
+  }
+
   private tools: ToolDefinitionJson[] = [
     {
       type: 'function',
@@ -62,23 +72,25 @@ export class AgentService {
 
   async sendMessage(node: workflowGraph['nodes'][0], input: string) {
     const { prompt, type } = node;
+    console.log('OPENROUTER_API_KEY', process.env.OPENROUTER_API_KEY);
     const messages: any[] = [
       { role: 'system', content: prompt },
       { role: 'user', content: input },
     ];
     let k = 1;
     while (true) {
-      console.log('loop is running for ', k++);
+      console.log('loop is running for', k++);
+      console.log('calling openrouter...'); // add this
       const completion = await this.openRouter.chat.send({
         chatGenerationParams: {
-          model: 'gpt-4o',
+          model: 'openai/gpt-4o',
           messages,
           tools: this.tools,
           maxTokens: 300,
           stream: false,
         },
       });
-
+      console.log('openrouter responded'); // add th
       const msg = completion.choices[0].message;
 
       console.log('msg', msg);

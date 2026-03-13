@@ -1,20 +1,37 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Queue } from 'bullmq';
 import { DagService } from 'src/service/dag/dag.service';
 import { workflowGraph } from 'src/types/types';
 import Redis from 'ioredis';
+import { ExecutionService } from 'src/modules/execution/execution.service';
 @Injectable()
-export class OrchestratorService {
+export class OrchestratorService implements OnModuleInit {
   private redis: Redis;
+  private redisSubscriber: Redis;
 
   constructor(
     private readonly dagService: DagService,
     @InjectQueue('orchestrator') private OrchestratorQueue: Queue,
+    @Inject(forwardRef(() => ExecutionService))
+    private readonly executionService: ExecutionService,
   ) {
     this.redis = new Redis({
       host: 'localhost',
       port: 6379,
+    });
+
+    this.redisSubscriber = new Redis({
+      host: 'localhost',
+      port: 6379,
+    });
+  }
+
+  onModuleInit() {
+    this.redisSubscriber.subscribe('agent-completed');
+    this.redisSubscriber.on('message', async (channel, message) => {
+      const { executionId, agentId } = JSON.parse(message);
+      await this.checkAgentStatus(executionId, agentId);
     });
   }
 
@@ -22,12 +39,13 @@ export class OrchestratorService {
     executionId: string,
     dependencyMap: Record<string, string[]>,
     workflowGraph: workflowGraph,
+    input: string,
   ) {
     const agentsTobeExecuted = this.dagService.getReadyAgents(dependencyMap);
 
     await this.redis.set(
       `execution:${executionId}:context`,
-      JSON.stringify({ dependencyMap, workflowGraph }),
+      JSON.stringify({ dependencyMap, workflowGraph, input }),
     );
 
     //now we push it to the queue right
@@ -39,8 +57,60 @@ export class OrchestratorService {
           executionId,
           agentId,
           agent,
+          input,
         });
       }),
     );
+  }
+
+  async checkAgentStatus(executionId: string, agentId: string) {
+    await this.redis.sadd(`execution:${executionId}:completed`, agentId);
+
+    const { dependencyMap, workflowGraph, input } = JSON.parse(
+      (await this.redis.get(`execution:${executionId}:context`)) || '{}',
+    );
+
+    const dependentAgents = Object.keys(dependencyMap).filter((key) =>
+      dependencyMap[key].includes(agentId),
+    );
+
+    for (const dependentAgentId of dependentAgents) {
+      const dependencies = dependencyMap[dependentAgentId];
+
+      const allDone = await Promise.all(
+        dependencies.map((dependency: string) =>
+          this.redis.sismember(
+            `execution:${executionId}:completed`,
+            dependency,
+          ),
+        ),
+      );
+
+      if (allDone.every((status) => status === 1)) {
+        const agent = workflowGraph.nodes.find(
+          (node: any) => node.id === dependentAgentId,
+        );
+
+        await this.OrchestratorQueue.add('execute-agent', {
+          executionId,
+          agentId: dependentAgentId,
+          agent,
+          input,
+        });
+      }
+    }
+
+    // check if all agents are done
+    const completedCount = await this.redis.scard(
+      `execution:${executionId}:completed`,
+    );
+    const totalAgents = workflowGraph.nodes.length;
+
+    if (completedCount === totalAgents) {
+      await this.executionService.updateExecutionStatus(
+        parseInt(executionId),
+        'completed',
+      );
+    }
   }
 }

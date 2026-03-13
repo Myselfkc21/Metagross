@@ -57,10 +57,51 @@ let ExecutionService = class ExecutionService {
             agentExecution.status = 'queue';
             await this.agentExecutionRepository.save(agentExecution);
         }));
+        const dependencyMap = this.dagService.buildDependencyMap(graph.nodes, graph.edges);
+        await this.orchestratorService.startInitialAgents(executionToSave.id.toString(), dependencyMap, graph, input);
         return {
             success: true,
             message: 'Execution created successfully',
             data: executionToSave,
+        };
+    }
+    async updateStatus(executionId, agentId, status, output) {
+        const agent = await this.agentExecutionRepository.findOneBy({
+            execution_id: executionId,
+            agent_id: agentId,
+        });
+        console.log('agent in update status', agent);
+        if (!agent) {
+            return {
+                success: 0,
+                message: 'Agent execution not found',
+            };
+        }
+        agent.status = status;
+        agent.end_time = new Date();
+        agent.output = output ? output : '';
+        await this.agentExecutionRepository.save(agent);
+        return {
+            success: 1,
+            message: 'Agent execution updated successfully',
+        };
+    }
+    async updateExecutionStatus(executionId, status) {
+        const execution = await this.executionRepository.findOneBy({
+            id: executionId,
+        });
+        if (!execution) {
+            return {
+                success: 0,
+                message: 'Execution not found',
+            };
+        }
+        execution.status = status;
+        execution.end_time = new Date();
+        await this.executionRepository.save(execution);
+        return {
+            success: 1,
+            message: 'Execution updated successfully',
         };
     }
 };
@@ -69,6 +110,7 @@ exports.ExecutionService = ExecutionService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, typeorm_1.InjectRepository)(execution_entity_1.Execution)),
     __param(2, (0, typeorm_1.InjectRepository)(agent_execution_entity_1.AgentExecution)),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => orchestrator_service_1.OrchestratorService))),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         workflow_service_1.WorkflowService,
         typeorm_2.Repository,
