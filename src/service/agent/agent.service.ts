@@ -9,10 +9,6 @@ dotenv.config();
 export class AgentService {
   private openRouter: OpenRouter;
   constructor() {
-    console.log(
-      'Initializing AgentService with OPENROUTER_API_KEY:',
-      process.env.OPENROUTER_API_KEY,
-    );
     this.openRouter = new OpenRouter({
       apiKey: process.env.OPENAI_API_KEY || '',
     });
@@ -72,28 +68,23 @@ export class AgentService {
 
   async sendMessage(node: workflowGraph['nodes'][0], input: string) {
     const { prompt, type } = node;
-    console.log('OPENROUTER_API_KEY', process.env.OPENROUTER_API_KEY);
     const messages: any[] = [
       { role: 'system', content: prompt },
       { role: 'user', content: input },
     ];
     let k = 1;
     while (true) {
-      console.log('loop is running for', k++);
-      console.log('calling openrouter...'); // add this
       const completion = await this.openRouter.chat.send({
         chatGenerationParams: {
           model: 'openai/gpt-4o',
           messages,
-          tools: this.tools,
+          tools: node.tools,
           maxTokens: 300,
           stream: false,
         },
       });
-      console.log('openrouter responded'); // add th
-      const msg = completion.choices[0].message;
 
-      console.log('msg', msg);
+      const msg = completion.choices[0].message;
       // TOOL CALL
       if (msg.toolCalls) {
         messages.push(msg);
@@ -114,6 +105,11 @@ export class AgentService {
             role: 'tool',
             toolCallId: toolCall.id,
             content: toolResult,
+          });
+          console.log(`Tool call ${k++}:`, {
+            name: toolCall.function.name,
+            arguments: args,
+            result: toolResult,
           });
         }
       } else {

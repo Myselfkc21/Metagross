@@ -13,8 +13,6 @@ export const typeormConfig = {
   migrationsTableName: 'migrations',
   autoLoadEntities: true,
 };
-
-console.log('typeormConfig', typeormConfig);
 export default new DataSource({
   ...typeormConfig,
   entities: ['src/database/entities/*.entity.ts'],

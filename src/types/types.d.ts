@@ -1,3 +1,5 @@
+import { ToolDefinitionJson } from '@openrouter/sdk/esm/models';
+
 export type configObject = { [key: string]: string };
 
 export type workflowGraph = {
@@ -5,6 +7,7 @@ export type workflowGraph = {
     id: string;
     type: string;
     prompt: string;
+    tools: ToolDefinitionJson[];
   }[];
   edges: {
     source: string;

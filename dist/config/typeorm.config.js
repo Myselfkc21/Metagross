@@ -16,7 +16,6 @@ exports.typeormConfig = {
     migrationsTableName: 'migrations',
     autoLoadEntities: true,
 };
-console.log('typeormConfig', exports.typeormConfig);
 exports.default = new typeorm_1.DataSource({
     ...exports.typeormConfig,
     entities: ['src/database/entities/*.entity.ts'],
