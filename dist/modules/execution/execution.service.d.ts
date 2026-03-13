@@ -21,4 +21,12 @@ export declare class ExecutionService {
         message: string;
         data: Execution;
     }>;
+    updateStatus(executionId: number, agentId: string, status: string, output?: string): Promise<{
+        success: number;
+        message: string;
+    }>;
+    updateExecutionStatus(executionId: number, status: string): Promise<{
+        success: number;
+        message: string;
+    }>;
 }

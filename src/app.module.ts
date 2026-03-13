@@ -20,6 +20,7 @@ import {
 import { join } from 'path';
 import { BullModule } from '@nestjs/bullmq';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AgentConsumerModule } from './queue/agentconsumer/agentconsumer.module';
 @Module({
   imports: [
     BullModule.forRoot({
@@ -50,6 +51,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     DagModule,
     AgentModule,
     StreamModule,
+    AgentConsumerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

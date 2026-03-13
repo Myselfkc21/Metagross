@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Execution } from 'src/database/entities/execution.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { WorkflowService } from '../workflow/workflow.service';
 import { AgentExecution } from 'src/database/entities/agent-execution.entity';
 import { OrchestratorService } from 'src/service/orchestrator/orchestrator.service';
 import { DagService } from 'src/service/dag/dag.service';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ExecutionService {
@@ -16,6 +17,7 @@ export class ExecutionService {
     private readonly workflowService: WorkflowService,
     @InjectRepository(AgentExecution)
     private readonly agentExecutionRepository: Repository<AgentExecution>,
+    @Inject(forwardRef(() => OrchestratorService))
     private readonly orchestratorService: OrchestratorService,
     private readonly dagService: DagService,
   ) {}
@@ -51,10 +53,70 @@ export class ExecutionService {
       }),
     );
 
+    const dependencyMap = this.dagService.buildDependencyMap(
+      graph.nodes,
+      graph.edges,
+    );
+
+    await this.orchestratorService.startInitialAgents(
+      executionToSave.id.toString(),
+      dependencyMap,
+      graph,
+      input,
+    );
+
     return {
       success: true,
       message: 'Execution created successfully',
       data: executionToSave,
+    };
+  }
+
+  async updateStatus(
+    executionId: number,
+    agentId: string,
+    status: string,
+    output?: string,
+  ) {
+    const agent = await this.agentExecutionRepository.findOneBy({
+      execution_id: executionId,
+      agent_id: agentId,
+    });
+    console.log('agent in update status', agent);
+    if (!agent) {
+      return {
+        success: 0,
+        message: 'Agent execution not found',
+      };
+    }
+    agent.status = status;
+    agent.end_time = new Date();
+    agent.output = output ? output : '';
+    await this.agentExecutionRepository.save(agent);
+
+    return {
+      success: 1,
+      message: 'Agent execution updated successfully',
+    };
+  }
+
+  async updateExecutionStatus(executionId: number, status: string) {
+    const execution = await this.executionRepository.findOneBy({
+      id: executionId,
+    });
+    if (!execution) {
+      return {
+        success: 0,
+        message: 'Execution not found',
+      };
+    }
+    execution.status = status;
+    execution.end_time = new Date();
+    await this.executionRepository.save(execution);
+
+    return {
+      success: 1,
+      message: 'Execution updated successfully',
     };
   }
 }

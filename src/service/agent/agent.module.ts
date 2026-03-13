@@ -6,5 +6,6 @@ import { AgentExecution } from 'src/database/entities/agent-execution.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([AgentExecution])],
   providers: [AgentService],
+  exports: [AgentService],
 })
 export class AgentModule {}

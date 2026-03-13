@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ExecutionService } from './execution.service';
 import { ExecutionController } from './execution.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,9 +13,10 @@ import { OrchestratorModule } from 'src/service/orchestrator/orchestrator.module
     TypeOrmModule.forFeature([Execution, AgentExecution]),
     WorkflowModule,
     DagModule,
-    OrchestratorModule,
+    forwardRef(() => OrchestratorModule),
   ],
   controllers: [ExecutionController],
   providers: [ExecutionService],
+  exports: [ExecutionService],
 })
 export class ExecutionModule {}
