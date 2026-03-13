@@ -21,31 +21,52 @@ export class AgentConsumer extends WorkerHost {
     });
   }
   async process(job: Job) {
-    const { executionId, agentId, agent, input } = job.data;
+    try {
+      const { executionId, agentId, agent, input, combinedOutput } = job.data;
 
-    console.log('job data in consumer', job.data);
-    //updating the status of the agent in the database to running
-    await this.executionService.updateStatus(executionId, agentId, 'running');
+      //updating the status of the agent in the database to running
+      await this.executionService.updateStatus(executionId, agentId, 'running');
 
-    console.log('agent is running', agentId);
-    //calling the openai service to run the agent and get the response
-    const output = await this.agentService.sendMessage(
-      { id: agentId, type: agent.type, prompt: agent.prompt },
-      input,
-    );
-    console.log('output from agent service', output);
-    //updating the status of the agent in the database to done
-    await this.executionService.updateStatus(
-      executionId,
-      agentId,
-      'completed',
-      output,
-    );
+      //calling the openai service to run the agent and get the response
+      const fullInput = combinedOutput
+        ? `${input}\n\nContext from previous agents:\n${combinedOutput}`
+        : input;
 
-    //now we need to publish this data
-    await this.redis.publish(
-      'agent-completed',
-      JSON.stringify({ executionId, agentId }),
-    );
+      console.log(`Executing agent ${agentId} with input:`, fullInput);
+      const output = await this.agentService.sendMessage(
+        {
+          id: agentId,
+          type: agent.type,
+          prompt: agent.prompt,
+          tools: agent.tools,
+        },
+        fullInput,
+      );
+
+      console.log(`Output from agent ${agentId}:`, output);
+      //now we are gonna store the ages output in redis so that we can use this output when other agents are dependent on this agent and also we will update the status of the agent in the database to done
+      await this.redis.set(
+        `execution:${executionId}:agent:${agentId}:output`,
+        JSON.stringify(output),
+      );
+
+      //updating the status of the agent in the database to done
+      await this.executionService.updateStatus(
+        executionId,
+        agentId,
+        'completed',
+        output,
+      );
+
+      //now we need to publish this data
+      const result = await this.redis.publish(
+        'agent-completed',
+        JSON.stringify({ executionId, agentId }),
+      );
+      console.log('Published to agent-completed, receivers:', result);
+    } catch (error) {
+      console.error('Error processing job:', error);
+      throw error;
+    }
   }
 }

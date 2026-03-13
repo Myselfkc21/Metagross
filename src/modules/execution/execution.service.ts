@@ -82,13 +82,16 @@ export class ExecutionService {
       execution_id: executionId,
       agent_id: agentId,
     });
-    console.log('agent in update status', agent);
     if (!agent) {
+      console.log('Agent execution not found');
       return {
         success: 0,
         message: 'Agent execution not found',
       };
     }
+    console.log(
+      `Updating status of agent ${agentId} in execution ${executionId} to ${status}`,
+    );
     agent.status = status;
     agent.end_time = new Date();
     agent.output = output ? output : '';

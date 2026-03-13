@@ -28,8 +28,11 @@ export class OrchestratorService implements OnModuleInit {
   }
 
   onModuleInit() {
-    this.redisSubscriber.subscribe('agent-completed');
+    this.redisSubscriber.subscribe('agent-completed', (err, count) => {
+      console.log('Subscribed to agent-completed, count:', count, 'err:', err);
+    });
     this.redisSubscriber.on('message', async (channel, message) => {
+      console.log(`Received message on channel ${channel}:`, message);
       const { executionId, agentId } = JSON.parse(message);
       await this.checkAgentStatus(executionId, agentId);
     });
@@ -91,11 +94,21 @@ export class OrchestratorService implements OnModuleInit {
           (node: any) => node.id === dependentAgentId,
         );
 
+        //now we need to get the output of all the dependencies and pass it as input
+        let combinedOutput = '';
+        for (const dependency of dependencies) {
+          const output = await this.redis.get(
+            `execution:${executionId}:agent:${dependency}:output`,
+          );
+          combinedOutput += output + '\n';
+        }
+
         await this.OrchestratorQueue.add('execute-agent', {
           executionId,
           agentId: dependentAgentId,
           agent,
           input,
+          combinedOutput,
         });
       }
     }
