@@ -1,98 +1,297 @@
+# Metagross
+
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" />
+  <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+  <img src="https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white" alt="OpenAI" />
+  <img src="https://img.shields.io/badge/BullMQ-FF0000?style=for-the-badge&logoColor=white" alt="BullMQ" />
+  <img src="https://img.shields.io/badge/React_Flow-FF0072?style=for-the-badge&logo=react&logoColor=white" alt="React Flow" />
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
+<p align="center">
+  <strong>A Multi-Agent Workflow Execution Engine built on DAG-based orchestration</strong>
 </p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+<p align="center">
+  Drag. Connect. Execute. — Build intelligent multi-agent pipelines visually and run them at scale.
+</p>
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Overview
 
-```bash
-$ npm install
+**Metagross** is a Multi-Agent Workflow Execution Engine. Users compose AI agent pipelines on a visual canvas by dragging and dropping agents and connecting them into a **Directed Acyclic Graph (DAG)**. The backend resolves dependencies, executes agents in parallel where possible, and streams real-time status updates back to the frontend.
+
+Each agent runs a **tool-calling loop** powered by OpenAI, allowing it to use external tools iteratively until its task is complete. Agents can be paired with **critic agents** that challenge their output before the workflow proceeds — and a **cost optimizer** dynamically routes tasks to cheaper or more capable models based on node stakes.
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Frontend (React Flow)                    │
+│   Drag & drop canvas → builds workflow graph → calls REST API   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │ HTTP
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         NestJS Backend                           │
+│                                                                  │
+│  ┌─────────────┐    ┌──────────────────┐    ┌────────────────┐  │
+│  │  Workflow   │    │   Orchestrator   │    │   Execution    │  │
+│  │  Controller │───▶│    Service       │───▶│    Service     │  │
+│  └─────────────┘    └────────┬─────────┘    └───────┬────────┘  │
+│                              │                       │           │
+│                    ┌─────────▼─────────┐             │           │
+│                    │    DAG Service    │             │           │
+│                    │  (dependency      │             │           │
+│                    │   resolution)     │             │           │
+│                    └─────────┬─────────┘             │           │
+│                              │                       │           │
+│                    ┌─────────▼──────────────────┐    │           │
+│                    │     BullMQ Queue           │    │           │
+│                    │  (orchestrator queue)      │    │           │
+│                    └─────────┬──────────────────┘    │           │
+│                              │                       │           │
+│                    ┌─────────▼──────────────────┐    │           │
+│                    │    Agent Consumer           │    │           │
+│                    │  (worker processor)         │    │           │
+│                    │  - Tool-calling loop        │    │           │
+│                    │  - Critic agent pair        │    │           │
+│                    │  - Model cost routing       │    │           │
+│                    └─────────┬──────────────────┘    │           │
+└──────────────────────────────┼───────────────────────┼───────────┘
+                               │                       │
+               ┌───────────────▼──────┐   ┌────────────▼──────────┐
+               │  Redis Pub/Sub       │   │        MySQL           │
+               │  agent-completed     │   │  workflows, executions │
+               │  channel             │   │  agent_executions      │
+               └───────────────┬──────┘   └───────────────────────┘
+                               │
+               ┌───────────────▼──────┐
+               │  SSE Stream          │
+               │  (real-time updates  │
+               │   to frontend)       │
+               └──────────────────────┘
 ```
 
-## Compile and run the project
+### Execution Flow
+
+1. User submits a workflow graph (nodes + edges) via the API.
+2. **DAG Service** resolves the dependency map from the graph edges.
+3. **Orchestrator Service** identifies agents with no dependencies (root nodes) and enqueues them.
+4. **Agent Consumer** processes each job: runs the tool-calling loop, optionally challenges output with a critic agent, and publishes an `agent-completed` event to Redis.
+5. **Orchestrator** listens on the Redis `agent-completed` channel, checks if all dependencies for downstream agents are satisfied, and enqueues the next wave.
+6. Real-time status updates are pushed to the frontend via **SSE**.
+7. When all agents complete, the execution is marked `completed` in MySQL.
+
+---
+
+## Features
+
+| Feature                     | Description                                                                                                           |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| **DAG Execution**           | Workflows are modeled as directed acyclic graphs with full dependency resolution                                      |
+| **Parallel Execution**      | Independent agents execute concurrently — no unnecessary waiting                                                      |
+| **Tool-Calling Loop**       | Each agent runs an iterative OpenAI tool-calling loop until the task is complete                                      |
+| **Adversarial Agent Pairs** | Every agent has an optional critic agent that challenges its output before the workflow proceeds                      |
+| **Cost Optimizer**          | Dynamically routes low-stakes nodes to cheap models (e.g. Haiku) and high-stakes nodes to capable models (e.g. GPT-4) |
+| **Real-Time Streaming**     | Execution status and agent output streamed to the frontend via Server-Sent Events (SSE)                               |
+| **Visual Canvas**           | React Flow-based drag-and-drop interface to compose workflows without writing code                                    |
+| **Workflow Persistence**    | Workflows and execution history stored in MySQL via TypeORM                                                           |
+
+---
+
+## Tech Stack
+
+### Backend
+
+| Layer          | Technology                                 |
+| -------------- | ------------------------------------------ |
+| Framework      | [NestJS](https://nestjs.com/) + TypeScript |
+| Job Queue      | [BullMQ](https://docs.bullmq.io/)          |
+| Message Broker | Redis Pub/Sub                              |
+| Database       | MySQL + TypeORM                            |
+| LLM            | OpenAI (GPT-4, Haiku)                      |
+| Streaming      | Server-Sent Events (SSE)                   |
+
+### Frontend
+
+| Layer   | Technology                           |
+| ------- | ------------------------------------ |
+| Canvas  | [React Flow](https://reactflow.dev/) |
+| Runtime | React + TypeScript                   |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- Redis (running locally or via Docker)
+- MySQL
+- OpenAI API key
+
+### Installation
 
 ```bash
-# development
-$ npm run start
+# Clone the repository
+git clone https://github.com/your-username/metagross.git
+cd metagross
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Install dependencies
+npm install
 ```
 
-## Run tests
+### Environment Variables
+
+Create a `.env` file in the root of the project:
+
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=3306
+DB_USERNAME=root
+DB_PASSWORD=your_password
+DB_NAME=metagross
+
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
+
+# OpenAI
+OPENAI_API_KEY=sk-...
+
+# App
+PORT=3000
+NODE_ENV=development
+```
+
+### Database Migrations
 
 ```bash
-# unit tests
-$ npm run test
+# Run all pending migrations
+npm run migration:run
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+# Revert the last migration
+npm run migration:revert
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Running the App
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Development (watch mode)
+npm run start:dev
+
+# Production build
+npm run build
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Running Tests
 
-## Resources
+```bash
+# Unit tests
+npm run test
 
-Check out a few resources that may come in handy when working with NestJS:
+# E2E tests
+npm run test:e2e
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+# Test coverage
+npm run test:cov
+```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## API Overview
 
-## Stay in touch
+### Workflows
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Method   | Endpoint        | Description           |
+| -------- | --------------- | --------------------- |
+| `POST`   | `/workflow`     | Create a new workflow |
+| `GET`    | `/workflow`     | List all workflows    |
+| `GET`    | `/workflow/:id` | Get a workflow by ID  |
+| `DELETE` | `/workflow/:id` | Delete a workflow     |
+
+### Executions
+
+| Method | Endpoint         | Description                      |
+| ------ | ---------------- | -------------------------------- |
+| `POST` | `/execution`     | Start a workflow execution       |
+| `GET`  | `/execution/:id` | Get execution status and results |
+
+### Streaming
+
+| Method | Endpoint               | Description                                |
+| ------ | ---------------------- | ------------------------------------------ |
+| `GET`  | `/stream/:executionId` | SSE stream for real-time execution updates |
+
+#### Example: Start an Execution
+
+```bash
+curl -X POST http://localhost:3000/execution \
+  -H "Content-Type: application/json" \
+  -d '{
+    "workflowId": 1,
+    "input": "Analyze the market trends for electric vehicles in 2025"
+  }'
+```
+
+#### Example: Stream Execution Updates
+
+```bash
+curl -N http://localhost:3000/stream/42
+```
+
+---
+
+## Project Structure
+
+```
+src/
+├── modules/
+│   ├── execution/          # Execution CRUD + status management
+│   ├── workflow/           # Workflow CRUD
+│   └── stream/             # SSE streaming controller
+├── service/
+│   ├── orchestrator/       # DAG orchestration + Redis pub/sub listener
+│   ├── dag/                # Dependency resolution logic
+│   ├── agent/              # OpenAI tool-calling loop + critic logic
+│   └── hash/               # Utility hashing service
+├── queue/
+│   └── agentconsumer/      # BullMQ worker — processes individual agent jobs
+├── database/
+│   ├── entities/           # TypeORM entities (Workflow, Execution, AgentExecution)
+│   └── migrations/         # Database migration files
+└── config/
+    └── typeorm.config.ts   # TypeORM datasource configuration
+```
+
+---
+
+## Contributing
+
+Contributions are welcome. Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature-name`
+3. Commit your changes using [Conventional Commits](https://www.conventionalcommits.org/): `git commit -m "feat: add critic agent timeout handling"`
+4. Push to your branch: `git push origin feat/your-feature-name`
+5. Open a Pull Request and describe the motivation and implementation
+
+### Guidelines
+
+- Keep PRs focused — one feature or fix per PR
+- Add or update tests where relevant
+- Ensure `npm run lint` passes before submitting
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+[MIT](LICENSE)
