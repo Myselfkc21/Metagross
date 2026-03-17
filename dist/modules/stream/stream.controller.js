@@ -17,8 +17,17 @@ let StreamController = class StreamController {
     constructor(streamService) {
         this.streamService = streamService;
     }
+    streamAgentUpdates() {
+        return this.streamService.getAgentUpdateStream();
+    }
 };
 exports.StreamController = StreamController;
+__decorate([
+    (0, common_1.Sse)('agent-updates'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], StreamController.prototype, "streamAgentUpdates", null);
 exports.StreamController = StreamController = __decorate([
     (0, common_1.Controller)('stream'),
     __metadata("design:paramtypes", [stream_service_1.StreamService])
