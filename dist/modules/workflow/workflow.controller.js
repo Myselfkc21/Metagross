@@ -16,6 +16,7 @@ exports.WorkflowController = void 0;
 const common_1 = require("@nestjs/common");
 const workflow_service_1 = require("./workflow.service");
 const create_workflow_dto_1 = require("./dto/create-workflow.dto");
+const update_workflow_dto_1 = require("./dto/update-workflow.dto");
 const swagger_1 = require("@nestjs/swagger");
 const workflow_entity_1 = require("../../database/entities/workflow.entity");
 let WorkflowController = class WorkflowController {
@@ -31,6 +32,9 @@ let WorkflowController = class WorkflowController {
     }
     async getAllWorkflows() {
         return this.workflowService.getAllWorkflows();
+    }
+    async updateWorkflow(id, updateWorkflowDto) {
+        return this.workflowService.updateWorkflow(id, updateWorkflowDto);
     }
 };
 exports.WorkflowController = WorkflowController;
@@ -58,7 +62,7 @@ __decorate([
         type: workflow_entity_1.Workflow,
     }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Workflow not found' }),
-    __param(0, (0, common_1.Body)('id')),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
@@ -75,6 +79,23 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], WorkflowController.prototype, "getAllWorkflows", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a workflow by ID' }),
+    (0, swagger_1.ApiBody)({ type: update_workflow_dto_1.UpdateWorkflowDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Workflow updated successfully',
+        type: workflow_entity_1.Workflow,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Invalid input' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Workflow not found' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, update_workflow_dto_1.UpdateWorkflowDto]),
+    __metadata("design:returntype", Promise)
+], WorkflowController.prototype, "updateWorkflow", null);
 exports.WorkflowController = WorkflowController = __decorate([
     (0, common_1.Controller)('workflow'),
     (0, swagger_1.ApiTags)('Workflow'),

@@ -105,6 +105,31 @@ let ExecutionService = class ExecutionService {
             message: 'Execution updated successfully',
         };
     }
+    async getExecution(executionId) {
+        if (!Number.isInteger(executionId) || executionId <= 0) {
+            return {
+                success: 0,
+                message: 'Invalid execution id',
+            };
+        }
+        const execution = await this.executionRepository.findOne({
+            where: { id: executionId },
+            relations: ['workflow'],
+        });
+        if (!execution) {
+            return {
+                success: 0,
+                message: 'Execution not found',
+            };
+        }
+        return {
+            success: 1,
+            message: 'Execution fetched successfully',
+            data: {
+                ...execution,
+            },
+        };
+    }
 };
 exports.ExecutionService = ExecutionService;
 exports.ExecutionService = ExecutionService = __decorate([

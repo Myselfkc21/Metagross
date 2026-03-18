@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
+import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Workflow } from 'src/database/entities/workflow.entity';
 
@@ -30,7 +31,7 @@ export class WorkflowController {
     type: Workflow,
   })
   @ApiResponse({ status: 404, description: 'Workflow not found' })
-  async getWorkflowById(@Body('id') id: number) {
+  async getWorkflowById(@Param('id', ParseIntPipe) id: number) {
     return this.workflowService.getWorkflowById(id);
   }
 
@@ -43,5 +44,22 @@ export class WorkflowController {
   })
   async getAllWorkflows() {
     return this.workflowService.getAllWorkflows();
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a workflow by ID' })
+  @ApiBody({ type: UpdateWorkflowDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Workflow updated successfully',
+    type: Workflow,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input' })
+  @ApiResponse({ status: 404, description: 'Workflow not found' })
+  async updateWorkflow(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateWorkflowDto: UpdateWorkflowDto,
+  ) {
+    return this.workflowService.updateWorkflow(id, updateWorkflowDto);
   }
 }

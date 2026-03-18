@@ -44,7 +44,6 @@ import { RedisModule } from './redis/redis.module';
         GraphQLWebsocketResolver,
       ],
     }),
-
     WorkflowModule,
     ExecutionModule,
     OrchestratorModule,

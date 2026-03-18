@@ -25,10 +25,13 @@ let ExecutionController = class ExecutionController {
     async runExecution(createExecutionDto) {
         return this.executionService.createExecution(createExecutionDto);
     }
+    async getExecutionStatus(executionId) {
+        return this.executionService.getExecution(executionId);
+    }
 };
 exports.ExecutionController = ExecutionController;
 __decorate([
-    (0, common_1.Post)('run'),
+    (0, common_1.Post)('execute'),
     (0, swagger_1.ApiOperation)({ summary: 'Run a workflow execution' }),
     (0, swagger_1.ApiBody)({ type: create_execution_dto_1.createExecutionDto }),
     __param(0, (0, common_1.Body)()),
@@ -36,6 +39,15 @@ __decorate([
     __metadata("design:paramtypes", [create_execution_dto_1.createExecutionDto]),
     __metadata("design:returntype", Promise)
 ], ExecutionController.prototype, "runExecution", null);
+__decorate([
+    (0, common_1.Get)('/:executionId'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get the single execution' }),
+    (0, swagger_1.ApiParam)({ name: 'executionId', type: Number, required: true }),
+    __param(0, (0, common_1.Param)('executionId', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], ExecutionController.prototype, "getExecutionStatus", null);
 exports.ExecutionController = ExecutionController = __decorate([
     (0, common_1.Controller)('execution'),
     __metadata("design:paramtypes", [execution_service_1.ExecutionService])

@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { ExecutionService } from './execution.service';
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { createExecutionDto } from './dto/create-execution.dto';
 
 @Controller('execution')
@@ -12,5 +12,14 @@ export class ExecutionController {
   @ApiBody({ type: createExecutionDto })
   async runExecution(@Body() createExecutionDto: createExecutionDto) {
     return this.executionService.createExecution(createExecutionDto);
+  }
+
+  @Get('/:executionId')
+  @ApiOperation({ summary: 'Get the single execution' })
+  @ApiParam({ name: 'executionId', type: Number, required: true })
+  async getExecutionStatus(
+    @Param('executionId', ParseIntPipe) executionId: number,
+  ) {
+    return this.executionService.getExecution(executionId);
   }
 }

@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StreamController = void 0;
 const common_1 = require("@nestjs/common");
@@ -17,17 +20,19 @@ let StreamController = class StreamController {
     constructor(streamService) {
         this.streamService = streamService;
     }
-    streamAgentUpdates() {
-        return this.streamService.getAgentUpdateStream();
+    stream(executionId, response) {
+        this.streamService.addClient(executionId, response);
     }
 };
 exports.StreamController = StreamController;
 __decorate([
-    (0, common_1.Sse)('agent-updates'),
+    (0, common_1.Get)(':executionId'),
+    __param(0, (0, common_1.Param)('executionId')),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", void 0)
-], StreamController.prototype, "streamAgentUpdates", null);
+], StreamController.prototype, "stream", null);
 exports.StreamController = StreamController = __decorate([
     (0, common_1.Controller)('stream'),
     __metadata("design:paramtypes", [stream_service_1.StreamService])
