@@ -1,24 +1,19 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { Job } from 'bullmq';
 import Redis from 'ioredis';
 import { ExecutionService } from 'src/modules/execution/execution.service';
 import { AgentService } from 'src/service/agent/agent.service';
+import { REDIS_CLIENT } from 'src/redis/redis.constants';
 
 @Processor('orchestrator')
 export class AgentConsumer extends WorkerHost {
-  private redis: Redis;
-
   constructor(
     private readonly agentService: AgentService,
     private readonly executionService: ExecutionService,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {
     super();
-    this.redis = new Redis({
-      host: 'localhost',
-      port: 6379,
-    });
   }
   async process(job: Job) {
     try {

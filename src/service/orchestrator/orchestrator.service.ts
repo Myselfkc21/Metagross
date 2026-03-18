@@ -5,27 +5,17 @@ import { DagService } from 'src/service/dag/dag.service';
 import { workflowGraph } from 'src/types/types';
 import Redis from 'ioredis';
 import { ExecutionService } from 'src/modules/execution/execution.service';
+import { REDIS_CLIENT, REDIS_SUBSCRIBER } from 'src/redis/redis.constants';
 @Injectable()
 export class OrchestratorService implements OnModuleInit {
-  private redis: Redis;
-  private redisSubscriber: Redis;
-
   constructor(
     private readonly dagService: DagService,
     @InjectQueue('orchestrator') private OrchestratorQueue: Queue,
     @Inject(forwardRef(() => ExecutionService))
     private readonly executionService: ExecutionService,
-  ) {
-    this.redis = new Redis({
-      host: 'localhost',
-      port: 6379,
-    });
-
-    this.redisSubscriber = new Redis({
-      host: 'localhost',
-      port: 6379,
-    });
-  }
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    @Inject(REDIS_SUBSCRIBER) private readonly redisSubscriber: Redis,
+  ) {}
 
   onModuleInit() {
     this.redisSubscriber.subscribe('agent-completed', (err, count) => {
