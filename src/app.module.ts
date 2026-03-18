@@ -19,8 +19,8 @@ import {
 } from 'nestjs-i18n';
 import { join } from 'path';
 import { BullModule } from '@nestjs/bullmq';
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AgentConsumerModule } from './queue/agentconsumer/agentconsumer.module';
+import { RedisModule } from './redis/redis.module';
 @Module({
   imports: [
     BullModule.forRoot({
@@ -52,6 +52,7 @@ import { AgentConsumerModule } from './queue/agentconsumer/agentconsumer.module'
     AgentModule,
     StreamModule,
     AgentConsumerModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

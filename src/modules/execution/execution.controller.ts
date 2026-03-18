@@ -7,7 +7,7 @@ import { createExecutionDto } from './dto/create-execution.dto';
 export class ExecutionController {
   constructor(private readonly executionService: ExecutionService) {}
 
-  @Post('run')
+  @Post('execute')
   @ApiOperation({ summary: 'Run a workflow execution' })
   @ApiBody({ type: createExecutionDto })
   async runExecution(@Body() createExecutionDto: createExecutionDto) {
