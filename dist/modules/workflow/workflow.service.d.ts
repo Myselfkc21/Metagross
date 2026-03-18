@@ -25,4 +25,8 @@ export declare class WorkflowService {
         message: string;
         data: Workflow;
     }>;
+    deleteWorkflow(id: number): Promise<{
+        success: number;
+        message: string;
+    }>;
 }

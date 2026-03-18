@@ -16,9 +16,9 @@ exports.WorkflowController = void 0;
 const common_1 = require("@nestjs/common");
 const workflow_service_1 = require("./workflow.service");
 const create_workflow_dto_1 = require("./dto/create-workflow.dto");
-const update_workflow_dto_1 = require("./dto/update-workflow.dto");
 const swagger_1 = require("@nestjs/swagger");
 const workflow_entity_1 = require("../../database/entities/workflow.entity");
+const update_workflow_dto_1 = require("./dto/update-workflow.dto");
 let WorkflowController = class WorkflowController {
     workflowService;
     constructor(workflowService) {
@@ -35,6 +35,9 @@ let WorkflowController = class WorkflowController {
     }
     async updateWorkflow(id, updateWorkflowDto) {
         return this.workflowService.updateWorkflow(id, updateWorkflowDto);
+    }
+    async deleteWorkflow(id) {
+        return this.workflowService.deleteWorkflow(id);
     }
 };
 exports.WorkflowController = WorkflowController;
@@ -96,6 +99,16 @@ __decorate([
     __metadata("design:paramtypes", [Number, update_workflow_dto_1.UpdateWorkflowDto]),
     __metadata("design:returntype", Promise)
 ], WorkflowController.prototype, "updateWorkflow", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a workflow by ID' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Workflow deleted successfully' }),
+    (0, swagger_1.ApiResponse)({ status: 404, description: 'Workflow not found' }),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], WorkflowController.prototype, "deleteWorkflow", null);
 exports.WorkflowController = WorkflowController = __decorate([
     (0, common_1.Controller)('workflow'),
     (0, swagger_1.ApiTags)('Workflow'),

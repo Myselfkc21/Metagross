@@ -70,6 +70,20 @@ let WorkflowService = class WorkflowService {
             data: updatedWorkflow,
         };
     }
+    async deleteWorkflow(id) {
+        const workflow = await this.workflowRepository.findOneBy({ id });
+        if (!workflow) {
+            return {
+                success: 0,
+                message: 'Workflow not found',
+            };
+        }
+        await this.workflowRepository.delete(id);
+        return {
+            success: 1,
+            message: 'common.company.deleted',
+        };
+    }
 };
 exports.WorkflowService = WorkflowService;
 exports.WorkflowService = WorkflowService = __decorate([
