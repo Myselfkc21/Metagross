@@ -10,13 +10,20 @@ exports.StreamModule = void 0;
 const common_1 = require("@nestjs/common");
 const stream_service_1 = require("./stream.service");
 const stream_controller_1 = require("./stream.controller");
+const bullmq_1 = require("@nestjs/bullmq");
 let StreamModule = class StreamModule {
 };
 exports.StreamModule = StreamModule;
 exports.StreamModule = StreamModule = __decorate([
     (0, common_1.Module)({
+        imports: [
+            bullmq_1.BullModule.registerQueue({
+                name: 'orchestrator',
+            }),
+        ],
         controllers: [stream_controller_1.StreamController],
         providers: [stream_service_1.StreamService],
+        exports: [stream_service_1.StreamService],
     })
 ], StreamModule);
 //# sourceMappingURL=stream.module.js.map

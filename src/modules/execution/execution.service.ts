@@ -7,7 +7,6 @@ import { WorkflowService } from '../workflow/workflow.service';
 import { AgentExecution } from 'src/database/entities/agent-execution.entity';
 import { OrchestratorService } from 'src/service/orchestrator/orchestrator.service';
 import { DagService } from 'src/service/dag/dag.service';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ExecutionService {
@@ -120,6 +119,38 @@ export class ExecutionService {
     return {
       success: 1,
       message: 'Execution updated successfully',
+    };
+  }
+
+  async getExecution(executionId: number) {
+    if (!Number.isInteger(executionId) || executionId <= 0) {
+      return {
+        success: 0,
+        message: 'Invalid execution id',
+      };
+    }
+
+    const execution = await this.executionRepository.findOne({
+      where: { id: executionId },
+      relations: ['workflow'],
+    });
+    if (!execution) {
+      return {
+        success: 0,
+        message: 'Execution not found',
+      };
+    }
+    // const agentExecutions = await this.agentExecutionRepository.findBy({
+    //   execution_id: executionId,
+    // });
+
+    return {
+      success: 1,
+      message: 'Execution fetched successfully',
+      data: {
+        ...execution,
+        // agents: agentExecutions,
+      },
     };
   }
 }

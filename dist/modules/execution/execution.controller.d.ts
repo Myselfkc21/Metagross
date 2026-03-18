@@ -12,4 +12,23 @@ export declare class ExecutionController {
         message: string;
         data: import("../../database/entities/execution.entity").Execution;
     }>;
+    getExecutionStatus(executionId: number): Promise<{
+        success: number;
+        message: string;
+        data?: undefined;
+    } | {
+        success: number;
+        message: string;
+        data: {
+            id: number;
+            workflow_id: number;
+            input: string;
+            status: string;
+            start_time: Date;
+            end_time: Date;
+            created_at: Date;
+            updated_at: Date;
+            workflow: import("../../database/entities/workflow.entity").Workflow;
+        };
+    }>;
 }

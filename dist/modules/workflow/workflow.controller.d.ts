@@ -1,5 +1,6 @@
 import { WorkflowService } from './workflow.service';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
+import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 import { Workflow } from 'src/database/entities/workflow.entity';
 export declare class WorkflowController {
     private readonly workflowService;
@@ -18,5 +19,10 @@ export declare class WorkflowController {
         success: number;
         message: string;
         data: Workflow[];
+    }>;
+    updateWorkflow(id: number, updateWorkflowDto: UpdateWorkflowDto): Promise<{
+        success: number;
+        message: string;
+        data: Workflow;
     }>;
 }

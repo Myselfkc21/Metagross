@@ -1,4 +1,4 @@
-import { IsObject, IsString } from 'class-validator';
+import { IsObject, IsOptional, IsString } from 'class-validator';
 import { workflowGraph } from 'src/types/types';
 
 export class CreateWorkflowDto {
@@ -6,5 +6,6 @@ export class CreateWorkflowDto {
   name: string;
 
   @IsObject()
+  @IsOptional()
   graph: workflowGraph;
 }

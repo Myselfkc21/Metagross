@@ -23,7 +23,10 @@ let WorkflowService = class WorkflowService {
         this.workflowRepository = workflowRepository;
     }
     async createWorkflow(createWorkflowDto) {
-        const workflow = this.workflowRepository.create(createWorkflowDto);
+        const { name } = createWorkflowDto;
+        const workflow = new workflow_entity_1.Workflow();
+        workflow.name = name;
+        workflow.graph = createWorkflowDto.graph || {};
         await this.workflowRepository.save(workflow);
         return {
             success: 1,
@@ -48,6 +51,23 @@ let WorkflowService = class WorkflowService {
             success: 1,
             message: 'common.company.fetched',
             data: workflows,
+        };
+    }
+    async updateWorkflow(id, updateWorkflowDto) {
+        console.log('updateWorkflowDto', updateWorkflowDto.graph?.nodes);
+        const workflow = await this.workflowRepository.findOneBy({ id });
+        if (!workflow) {
+            throw new Error(`Workflow with id ${id} not found`);
+        }
+        const updatedWorkflow = new workflow_entity_1.Workflow();
+        updatedWorkflow.id = workflow.id;
+        updatedWorkflow.name = updateWorkflowDto.name || workflow.name;
+        updatedWorkflow.graph = updateWorkflowDto.graph || workflow.graph;
+        await this.workflowRepository.save(updatedWorkflow);
+        return {
+            success: 1,
+            message: 'common.company.updated',
+            data: updatedWorkflow,
         };
     }
 };

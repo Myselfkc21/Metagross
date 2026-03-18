@@ -23,6 +23,7 @@ const nestjs_i18n_1 = require("nestjs-i18n");
 const path_1 = require("path");
 const bullmq_1 = require("@nestjs/bullmq");
 const agentconsumer_module_1 = require("./queue/agentconsumer/agentconsumer.module");
+const redis_module_1 = require("./redis/redis.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -57,6 +58,7 @@ exports.AppModule = AppModule = __decorate([
             agent_module_1.AgentModule,
             stream_module_1.StreamModule,
             agentconsumer_module_1.AgentConsumerModule,
+            redis_module_1.RedisModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

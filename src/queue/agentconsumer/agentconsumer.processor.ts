@@ -5,12 +5,14 @@ import Redis from 'ioredis';
 import { ExecutionService } from 'src/modules/execution/execution.service';
 import { AgentService } from 'src/service/agent/agent.service';
 import { REDIS_CLIENT } from 'src/redis/redis.constants';
+import { StreamService } from 'src/modules/stream/stream.service';
 
 @Processor('orchestrator')
 export class AgentConsumer extends WorkerHost {
   constructor(
     private readonly agentService: AgentService,
     private readonly executionService: ExecutionService,
+    private readonly streamService: StreamService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {
     super();
@@ -21,7 +23,7 @@ export class AgentConsumer extends WorkerHost {
 
       //updating the status of the agent in the database to running
       await this.executionService.updateStatus(executionId, agentId, 'running');
-
+      this.streamService.emit(executionId, { agentId, status: 'running' });
       //calling the openai service to run the agent and get the response
       const fullInput = combinedOutput
         ? `${input}\n\nContext from previous agents:\n${combinedOutput}`
@@ -52,6 +54,12 @@ export class AgentConsumer extends WorkerHost {
         'completed',
         output,
       );
+
+      this.streamService.emit(executionId, {
+        agentId,
+        status: 'completed',
+        output,
+      });
 
       //now we need to publish this data
       const result = await this.redis.publish(
