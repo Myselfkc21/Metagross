@@ -1,20 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { OpenRouter } from '@openrouter/sdk';
-import { ToolDefinitionJson } from '@openrouter/sdk/esm/models';
+import OpenAI from 'openai';
 import { workflowGraph } from 'src/types/types';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Injectable()
 export class AgentService {
-  private openRouter: OpenRouter;
+  private openai: OpenAI;
   constructor() {
-    this.openRouter = new OpenRouter({
+    this.openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY || '',
     });
   }
 
-  private tools: ToolDefinitionJson[] = [
+  private tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     {
       type: 'function',
       function: {
@@ -74,22 +73,24 @@ export class AgentService {
     ];
     let k = 1;
     while (true) {
-      const completion = await this.openRouter.chat.send({
-        chatGenerationParams: {
-          model: 'openai/gpt-4o',
-          messages,
-          tools: node.tools,
-          maxTokens: 300,
-          stream: false,
-        },
+      const completion = await this.openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages,
+        tools: node.tools,
+        max_tokens: 300,
+        stream: false,
       });
 
       const msg = completion.choices[0].message;
       // TOOL CALL
-      if (msg.toolCalls) {
+      if (msg.tool_calls && msg.tool_calls.length > 0) {
         messages.push(msg);
-        for (let i = 0; i < msg.toolCalls.length; i++) {
-          let toolCall = msg.toolCalls[i];
+        for (let i = 0; i < msg.tool_calls.length; i++) {
+          const toolCall = msg.tool_calls[i];
+          if (toolCall.type !== 'function') {
+            continue;
+          }
+
           const args = JSON.parse(toolCall.function.arguments);
 
           let toolResult = '';
@@ -103,7 +104,7 @@ export class AgentService {
           }
           messages.push({
             role: 'tool',
-            toolCallId: toolCall.id,
+            tool_call_id: toolCall.id,
             content: toolResult,
           });
           console.log(`Tool call ${k++}:`, {
@@ -113,7 +114,7 @@ export class AgentService {
           });
         }
       } else {
-        return msg.content;
+        return msg.content ?? '';
       }
     }
   }

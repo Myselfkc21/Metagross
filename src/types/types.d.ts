@@ -1,4 +1,4 @@
-import { ToolDefinitionJson } from '@openrouter/sdk/esm/models';
+import OpenAI from 'openai';
 
 export type configObject = { [key: string]: string };
 
@@ -7,7 +7,7 @@ export type workflowGraph = {
     id: string;
     type: string;
     prompt: string;
-    tools: ToolDefinitionJson[];
+    tools: OpenAI.Chat.Completions.ChatCompletionTool[];
   }[];
   edges: {
     source: string;

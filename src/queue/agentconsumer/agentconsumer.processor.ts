@@ -7,7 +7,7 @@ import { AgentService } from 'src/service/agent/agent.service';
 import { REDIS_CLIENT } from 'src/redis/redis.constants';
 import { StreamService } from 'src/modules/stream/stream.service';
 
-@Processor('orchestrator')
+@Processor('orchestrator', { concurrency: 5 })
 export class AgentConsumer extends WorkerHost {
   constructor(
     private readonly agentService: AgentService,
