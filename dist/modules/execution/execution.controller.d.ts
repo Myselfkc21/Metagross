@@ -3,6 +3,11 @@ import { createExecutionDto } from './dto/create-execution.dto';
 export declare class ExecutionController {
     private readonly executionService;
     constructor(executionService: ExecutionService);
+    getAllExecutions(): Promise<{
+        success: number;
+        message: string;
+        data: import("../../database/entities/execution.entity").Execution[];
+    }>;
     runExecution(createExecutionDto: createExecutionDto): Promise<{
         success: boolean;
         message: string;
@@ -31,10 +36,5 @@ export declare class ExecutionController {
             updated_at: Date;
             workflow: import("../../database/entities/workflow.entity").Workflow;
         };
-    }>;
-    getAllExecutions(): Promise<{
-        success: number;
-        message: string;
-        data: import("../../database/entities/execution.entity").Execution[];
     }>;
 }

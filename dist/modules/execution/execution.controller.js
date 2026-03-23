@@ -22,17 +22,24 @@ let ExecutionController = class ExecutionController {
     constructor(executionService) {
         this.executionService = executionService;
     }
+    async getAllExecutions() {
+        return this.executionService.getAllExecutions();
+    }
     async runExecution(createExecutionDto) {
         return this.executionService.createExecution(createExecutionDto);
     }
     async getExecutionStatus(executionId) {
         return this.executionService.getExecution(executionId);
     }
-    async getAllExecutions() {
-        return this.executionService.getAllExecutions();
-    }
 };
 exports.ExecutionController = ExecutionController;
+__decorate([
+    (0, common_1.Get)(''),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all executions' }),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], ExecutionController.prototype, "getAllExecutions", null);
 __decorate([
     (0, common_1.Post)('execute'),
     (0, swagger_1.ApiOperation)({ summary: 'Run a workflow execution' }),
@@ -51,13 +58,6 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ExecutionController.prototype, "getExecutionStatus", null);
-__decorate([
-    (0, common_1.Get)(''),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all executions' }),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], ExecutionController.prototype, "getAllExecutions", null);
 exports.ExecutionController = ExecutionController = __decorate([
     (0, common_1.Controller)('execution'),
     __metadata("design:paramtypes", [execution_service_1.ExecutionService])

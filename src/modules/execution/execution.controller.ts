@@ -14,6 +14,12 @@ import { createExecutionDto } from './dto/create-execution.dto';
 export class ExecutionController {
   constructor(private readonly executionService: ExecutionService) {}
 
+  @Get('')
+  @ApiOperation({ summary: 'Get all executions' })
+  async getAllExecutions() {
+    return this.executionService.getAllExecutions();
+  }
+
   @Post('execute')
   @ApiOperation({ summary: 'Run a workflow execution' })
   @ApiBody({ type: createExecutionDto })
@@ -28,11 +34,5 @@ export class ExecutionController {
     @Param('executionId', ParseIntPipe) executionId: number,
   ) {
     return this.executionService.getExecution(executionId);
-  }
-
-  @Get('')
-  @ApiOperation({ summary: 'Get all executions' })
-  async getAllExecutions() {
-    return this.executionService.getAllExecutions();
   }
 }
