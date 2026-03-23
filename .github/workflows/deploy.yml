@@ -37,4 +37,5 @@ jobs:
           SCRIPT_BEFORE: |
             cd /home/ec2-user/Metagross && npm ci
           SCRIPT_AFTER: |
+            cd /home/ec2-user/Metagross && npm run migration:run
             cd /home/ec2-user/Metagross && pm2 restart metagross
