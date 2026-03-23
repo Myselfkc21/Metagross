@@ -21,12 +21,12 @@ export class AgentExecutions1773291151401 implements MigrationInterface {
           {
             name: 'execution_id',
             type: 'int',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'agent_id',
             type: 'varchar',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'output',
@@ -41,12 +41,12 @@ export class AgentExecutions1773291151401 implements MigrationInterface {
           {
             name: 'start_time',
             type: 'timestamp',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'end_time',
             type: 'timestamp',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'created_at',

@@ -16,12 +16,12 @@ export class Workflow1773090811125 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'graph',
             type: 'json',
-            isNullable: false,
+            isNullable: true,
           },
           {
             name: 'created_at',
