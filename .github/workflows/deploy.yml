@@ -33,10 +33,7 @@ jobs:
           REMOTE_USER: ec2-user
           TARGET: /home/ec2-user/Metagross
           SOURCE: 'dist/'
-          EXCLUDE: |
-            .git*
-            node_modules
-            .env
+          EXCLUDE: '.git*, node_modules, .env'
           SCRIPT_BEFORE: |
             cd /home/ec2-user/Metagross && npm ci
           SCRIPT_AFTER: |
