@@ -17,27 +17,27 @@ class migration1773161360923 {
                 {
                     name: 'workflow_id',
                     type: 'int',
-                    isNullable: false,
+                    isNullable: true,
                 },
                 {
                     name: 'input',
                     type: 'varchar',
-                    isNullable: false,
+                    isNullable: true,
                 },
                 {
                     name: 'status',
                     type: 'varchar',
-                    isNullable: false,
+                    isNullable: true,
                 },
                 {
                     name: 'start_time',
                     type: 'timestamp',
-                    isNullable: false,
+                    isNullable: true,
                 },
                 {
                     name: 'end_time',
                     type: 'timestamp',
-                    isNullable: false,
+                    isNullable: true,
                 },
                 {
                     name: 'created_at',

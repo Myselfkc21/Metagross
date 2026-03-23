@@ -20,6 +20,7 @@ export declare class ExecutionController {
         success: number;
         message: string;
         data: {
+            agents: import("../../database/entities/agent-execution.entity").AgentExecution[];
             id: number;
             workflow_id: number;
             input: string;
@@ -30,5 +31,10 @@ export declare class ExecutionController {
             updated_at: Date;
             workflow: import("../../database/entities/workflow.entity").Workflow;
         };
+    }>;
+    getAllExecutions(): Promise<{
+        success: number;
+        message: string;
+        data: import("../../database/entities/execution.entity").Execution[];
     }>;
 }

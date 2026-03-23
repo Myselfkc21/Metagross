@@ -37,6 +37,7 @@ export declare class ExecutionService {
         success: number;
         message: string;
         data: {
+            agents: AgentExecution[];
             id: number;
             workflow_id: number;
             input: string;
@@ -47,5 +48,10 @@ export declare class ExecutionService {
             updated_at: Date;
             workflow: import("../../database/entities/workflow.entity").Workflow;
         };
+    }>;
+    getAllExecutions(): Promise<{
+        success: number;
+        message: string;
+        data: Execution[];
     }>;
 }

@@ -140,17 +140,28 @@ export class ExecutionService {
         message: 'Execution not found',
       };
     }
-    // const agentExecutions = await this.agentExecutionRepository.findBy({
-    //   execution_id: executionId,
-    // });
+    const agentExecutions = await this.agentExecutionRepository.findBy({
+      execution_id: executionId,
+    });
 
     return {
       success: 1,
       message: 'Execution fetched successfully',
       data: {
         ...execution,
-        // agents: agentExecutions,
+        agents: agentExecutions,
       },
+    };
+  }
+
+  async getAllExecutions() {
+    const executions = await this.executionRepository.find({
+      relations: ['workflow'],
+    });
+    return {
+      success: 1,
+      message: 'Executions fetched successfully',
+      data: executions,
     };
   }
 }
