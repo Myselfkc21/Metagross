@@ -49,9 +49,17 @@ export declare class ExecutionService {
             workflow: import("../../database/entities/workflow.entity").Workflow;
         };
     }>;
-    getAllExecutions(): Promise<{
+    getAllExecutions(page?: number, limit?: number): Promise<{
         success: number;
         message: string;
-        data: Execution[];
+        data: {
+            items: Execution[];
+            pagination: {
+                page: number;
+                limit: number;
+                total: number;
+                totalPages: number;
+            };
+        };
     }>;
 }

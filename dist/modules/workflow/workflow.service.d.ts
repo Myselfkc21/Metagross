@@ -15,10 +15,18 @@ export declare class WorkflowService {
         message: string;
         data: Workflow;
     }>;
-    getAllWorkflows(): Promise<{
+    getAllWorkflows(page?: number, limit?: number): Promise<{
         success: number;
         message: string;
-        data: Workflow[];
+        data: {
+            items: Workflow[];
+            pagination: {
+                page: number;
+                limit: number;
+                total: number;
+                totalPages: number;
+            };
+        };
     }>;
     updateWorkflow(id: number, updateWorkflowDto: UpdateWorkflowDto): Promise<{
         success: number;

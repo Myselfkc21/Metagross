@@ -5,9 +5,10 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ExecutionService } from './execution.service';
-import { ApiBody, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { createExecutionDto } from './dto/create-execution.dto';
 
 @Controller('execution')
@@ -16,8 +17,16 @@ export class ExecutionController {
 
   @Get('')
   @ApiOperation({ summary: 'Get all executions' })
-  async getAllExecutions() {
-    return this.executionService.getAllExecutions();
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getAllExecutions(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedPage = Number(page);
+    const parsedLimit = Number(limit);
+
+    return this.executionService.getAllExecutions(parsedPage, parsedLimit);
   }
 
   @Post('execute')

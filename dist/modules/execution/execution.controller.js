@@ -22,8 +22,10 @@ let ExecutionController = class ExecutionController {
     constructor(executionService) {
         this.executionService = executionService;
     }
-    async getAllExecutions() {
-        return this.executionService.getAllExecutions();
+    async getAllExecutions(page, limit) {
+        const parsedPage = Number(page);
+        const parsedLimit = Number(limit);
+        return this.executionService.getAllExecutions(parsedPage, parsedLimit);
     }
     async runExecution(createExecutionDto) {
         return this.executionService.createExecution(createExecutionDto);
@@ -36,8 +38,12 @@ exports.ExecutionController = ExecutionController;
 __decorate([
     (0, common_1.Get)(''),
     (0, swagger_1.ApiOperation)({ summary: 'Get all executions' }),
+    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, example: 1 }),
+    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, example: 10 }),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], ExecutionController.prototype, "getAllExecutions", null);
 __decorate([

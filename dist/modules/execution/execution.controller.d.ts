@@ -3,10 +3,18 @@ import { createExecutionDto } from './dto/create-execution.dto';
 export declare class ExecutionController {
     private readonly executionService;
     constructor(executionService: ExecutionService);
-    getAllExecutions(): Promise<{
+    getAllExecutions(page?: string, limit?: string): Promise<{
         success: number;
         message: string;
-        data: import("../../database/entities/execution.entity").Execution[];
+        data: {
+            items: import("../../database/entities/execution.entity").Execution[];
+            pagination: {
+                page: number;
+                limit: number;
+                total: number;
+                totalPages: number;
+            };
+        };
     }>;
     runExecution(createExecutionDto: createExecutionDto): Promise<{
         success: boolean;

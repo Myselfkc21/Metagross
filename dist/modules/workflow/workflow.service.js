@@ -45,12 +45,29 @@ let WorkflowService = class WorkflowService {
             data: workflow,
         };
     }
-    async getAllWorkflows() {
-        const workflows = await this.workflowRepository.find();
+    async getAllWorkflows(page, limit) {
+        const sanitizedPage = Number.isInteger(page) && page && page > 0 ? page : 1;
+        const sanitizedLimit = Number.isInteger(limit) && limit && limit > 0
+            ? Math.min(limit, 100)
+            : 10;
+        const skip = (sanitizedPage - 1) * sanitizedLimit;
+        const [workflows, total] = await this.workflowRepository.findAndCount({
+            skip,
+            take: sanitizedLimit,
+            order: { id: 'DESC' },
+        });
         return {
             success: 1,
             message: 'common.company.fetched',
-            data: workflows,
+            data: {
+                items: workflows,
+                pagination: {
+                    page: sanitizedPage,
+                    limit: sanitizedLimit,
+                    total,
+                    totalPages: Math.ceil(total / sanitizedLimit),
+                },
+            },
         };
     }
     async updateWorkflow(id, updateWorkflowDto) {

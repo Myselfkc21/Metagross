@@ -30,8 +30,10 @@ let WorkflowController = class WorkflowController {
     async getWorkflowById(id) {
         return this.workflowService.getWorkflowById(id);
     }
-    async getAllWorkflows() {
-        return this.workflowService.getAllWorkflows();
+    async getAllWorkflows(page, limit) {
+        const parsedPage = Number(page);
+        const parsedLimit = Number(limit);
+        return this.workflowService.getAllWorkflows(parsedPage, parsedLimit);
     }
     async updateWorkflow(id, updateWorkflowDto) {
         return this.workflowService.updateWorkflow(id, updateWorkflowDto);
@@ -78,8 +80,12 @@ __decorate([
         description: 'Workflows fetched successfully',
         type: [workflow_entity_1.Workflow],
     }),
+    (0, swagger_1.ApiQuery)({ name: 'page', required: false, type: Number, example: 1 }),
+    (0, swagger_1.ApiQuery)({ name: 'limit', required: false, type: Number, example: 10 }),
+    __param(0, (0, common_1.Query)('page')),
+    __param(1, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], WorkflowController.prototype, "getAllWorkflows", null);
 __decorate([

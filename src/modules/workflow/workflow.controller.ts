@@ -7,10 +7,17 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { WorkflowService } from './workflow.service';
 import { CreateWorkflowDto } from './dto/create-workflow.dto';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Workflow } from 'src/database/entities/workflow.entity';
 import { UpdateWorkflowDto } from './dto/update-workflow.dto';
 
@@ -51,8 +58,16 @@ export class WorkflowController {
     description: 'Workflows fetched successfully',
     type: [Workflow],
   })
-  async getAllWorkflows() {
-    return this.workflowService.getAllWorkflows();
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getAllWorkflows(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const parsedPage = Number(page);
+    const parsedLimit = Number(limit);
+
+    return this.workflowService.getAllWorkflows(parsedPage, parsedLimit);
   }
 
   @Patch(':id')

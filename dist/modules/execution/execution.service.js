@@ -134,14 +134,30 @@ let ExecutionService = class ExecutionService {
             },
         };
     }
-    async getAllExecutions() {
-        const executions = await this.executionRepository.find({
+    async getAllExecutions(page, limit) {
+        const sanitizedPage = Number.isInteger(page) && page && page > 0 ? page : 1;
+        const sanitizedLimit = Number.isInteger(limit) && limit && limit > 0
+            ? Math.min(limit, 100)
+            : 10;
+        const skip = (sanitizedPage - 1) * sanitizedLimit;
+        const [executions, total] = await this.executionRepository.findAndCount({
             relations: ['workflow'],
+            skip,
+            take: sanitizedLimit,
+            order: { id: 'DESC' },
         });
         return {
             success: 1,
             message: 'Executions fetched successfully',
-            data: executions,
+            data: {
+                items: executions,
+                pagination: {
+                    page: sanitizedPage,
+                    limit: sanitizedLimit,
+                    total,
+                    totalPages: Math.ceil(total / sanitizedLimit),
+                },
+            },
         };
     }
 };
