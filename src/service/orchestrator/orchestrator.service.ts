@@ -67,6 +67,20 @@ export class OrchestratorService implements OnModuleInit {
       dependencyMap[key].includes(agentId),
     );
 
+    const humanInterventionAgents = dependentAgents.filter(
+      (agentId) => agentId === 'HITL',
+    );
+
+    if (humanInterventionAgents.length > 0) {
+      //now we need to stop it here.
+      //so we return here and wait for the users answer
+      //so the frontend gets the popup then he answers it
+      //another api is called whcih will update the status of the node with users answer in redis
+      //in that method only, if he is accepting then we should resume this execution
+      //it means we need to get the last executed agentId,
+      //hows the thought processs so far or how wrong is this
+    }
+
     for (const dependentAgentId of dependentAgents) {
       const dependencies = dependencyMap[dependentAgentId];
 
