@@ -12,7 +12,6 @@ export class AgentService {
       apiKey: process.env.OPENAI_API_KEY || '',
     });
   }
-
   private tools: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     {
       type: 'function',
