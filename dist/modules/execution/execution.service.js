@@ -21,18 +21,21 @@ const workflow_service_1 = require("../workflow/workflow.service");
 const agent_execution_entity_1 = require("../../database/entities/agent-execution.entity");
 const orchestrator_service_1 = require("../../service/orchestrator/orchestrator.service");
 const dag_service_1 = require("../../service/dag/dag.service");
+const redis_constants_1 = require("../../redis/redis.constants");
 let ExecutionService = class ExecutionService {
     executionRepository;
     workflowService;
     agentExecutionRepository;
     orchestratorService;
     dagService;
-    constructor(executionRepository, workflowService, agentExecutionRepository, orchestratorService, dagService) {
+    redis;
+    constructor(executionRepository, workflowService, agentExecutionRepository, orchestratorService, dagService, redis) {
         this.executionRepository = executionRepository;
         this.workflowService = workflowService;
         this.agentExecutionRepository = agentExecutionRepository;
         this.orchestratorService = orchestratorService;
         this.dagService = dagService;
+        this.redis = redis;
     }
     async createExecution(executiondto) {
         const { workflowId, input } = executiondto;
@@ -136,9 +139,7 @@ let ExecutionService = class ExecutionService {
     }
     async getAllExecutions(page, limit) {
         const sanitizedPage = Number.isInteger(page) && page && page > 0 ? page : 1;
-        const sanitizedLimit = Number.isInteger(limit) && limit && limit > 0
-            ? Math.min(limit, 100)
-            : 10;
+        const sanitizedLimit = Number.isInteger(limit) && limit && limit > 0 ? Math.min(limit, 100) : 10;
         const skip = (sanitizedPage - 1) * sanitizedLimit;
         const [executions, total] = await this.executionRepository.findAndCount({
             relations: ['workflow'],
@@ -160,6 +161,27 @@ let ExecutionService = class ExecutionService {
             },
         };
     }
+    async processHITL(ack, executionId) {
+        if (ack == 'reject') {
+            const execution = await this.executionRepository.findOneByOrFail({
+                id: executionId,
+            });
+            execution.status = 'canclled';
+            await this.executionRepository.save(execution);
+            const agentsExecution = await this.agentExecutionRepository.findBy({
+                execution_id: executionId,
+            });
+            agentsExecution.map(async (agent) => {
+                agent.status = 'canclled';
+                await this.agentExecutionRepository.save(agent);
+            });
+        }
+        else {
+            const executionAgent = await this.redis.get(`execution:${executionId}:hitl:agent`);
+            const agentId = executionAgent ? executionAgent : '';
+            await this.orchestratorService.checkAgentStatus(executionId.toString(), agentId);
+        }
+    }
 };
 exports.ExecutionService = ExecutionService;
 exports.ExecutionService = ExecutionService = __decorate([
@@ -167,10 +189,11 @@ exports.ExecutionService = ExecutionService = __decorate([
     __param(0, (0, typeorm_1.InjectRepository)(execution_entity_1.Execution)),
     __param(2, (0, typeorm_1.InjectRepository)(agent_execution_entity_1.AgentExecution)),
     __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => orchestrator_service_1.OrchestratorService))),
+    __param(5, (0, common_1.Inject)(redis_constants_1.REDIS_CLIENT)),
     __metadata("design:paramtypes", [typeorm_2.Repository,
         workflow_service_1.WorkflowService,
         typeorm_2.Repository,
         orchestrator_service_1.OrchestratorService,
-        dag_service_1.DagService])
+        dag_service_1.DagService, Object])
 ], ExecutionService);
 //# sourceMappingURL=execution.service.js.map

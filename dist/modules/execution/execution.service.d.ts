@@ -11,7 +11,8 @@ export declare class ExecutionService {
     private readonly agentExecutionRepository;
     private readonly orchestratorService;
     private readonly dagService;
-    constructor(executionRepository: Repository<Execution>, workflowService: WorkflowService, agentExecutionRepository: Repository<AgentExecution>, orchestratorService: OrchestratorService, dagService: DagService);
+    private readonly redis;
+    constructor(executionRepository: Repository<Execution>, workflowService: WorkflowService, agentExecutionRepository: Repository<AgentExecution>, orchestratorService: OrchestratorService, dagService: DagService, redis: any);
     createExecution(executiondto: createExecutionDto): Promise<{
         success: boolean;
         message: string;
@@ -62,4 +63,5 @@ export declare class ExecutionService {
             };
         };
     }>;
+    processHITL(ack: string, executionId: number): Promise<void>;
 }

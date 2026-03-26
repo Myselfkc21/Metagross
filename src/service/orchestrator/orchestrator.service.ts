@@ -66,10 +66,11 @@ export class OrchestratorService implements OnModuleInit {
     const dependentAgents = Object.keys(dependencyMap).filter((key) =>
       dependencyMap[key].includes(agentId),
     );
-
+    console.log('Dependency', dependentAgents);
     const humanInterventionAgents = dependentAgents.filter(
       (agentId) => agentId === 'HITL',
     );
+    console.log('HITL', humanInterventionAgents);
 
     if (humanInterventionAgents.length > 0) {
       //now we need to stop it here.
@@ -79,7 +80,13 @@ export class OrchestratorService implements OnModuleInit {
       //in that method only, if he is accepting then we should resume this execution
       //it means we need to get the last executed agentId,
       //hows the thought processs so far or how wrong is this
+      console.log('in here ');
+      //so here we need to store the agentId in redis
 
+      await this.redis.set(
+        `execution:${executionId}:hitl:agent`,
+        JSON.stringify(humanInterventionAgents),
+      );
       return {
         success: 1,
         message: 'Please approve or reject the flow',
