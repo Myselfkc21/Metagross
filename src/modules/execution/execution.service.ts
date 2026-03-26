@@ -8,6 +8,7 @@ import { AgentExecution } from 'src/database/entities/agent-execution.entity';
 import { OrchestratorService } from 'src/service/orchestrator/orchestrator.service';
 import { DagService } from 'src/service/dag/dag.service';
 import { REDIS_CLIENT } from 'src/redis/redis.constants';
+import { StreamService } from '../stream/stream.service';
 
 @Injectable()
 export class ExecutionService {
@@ -21,6 +22,7 @@ export class ExecutionService {
     private readonly orchestratorService: OrchestratorService,
     private readonly dagService: DagService,
     @Inject(REDIS_CLIENT) private readonly redis,
+    private readonly streamService: StreamService,
   ) {}
 
   async createExecution(executiondto: createExecutionDto) {
@@ -97,7 +99,7 @@ export class ExecutionService {
     agent.end_time = new Date();
     agent.output = output ? output : '';
     await this.agentExecutionRepository.save(agent);
-
+    console.log(`Updated agent execution:`, agent);
     return {
       success: 1,
       message: 'Agent execution updated successfully',
@@ -184,8 +186,11 @@ export class ExecutionService {
     };
   }
 
-  async processHITL(ack: string, executionId: number) {
+  async processHITL(ack: string, executionId: number, agentId: string) {
     if (ack == 'reject') {
+      await this.streamService.emit(executionId.toString(), {
+        status: 'canclled',
+      });
       const execution = await this.executionRepository.findOneByOrFail({
         id: executionId,
       });
@@ -198,12 +203,22 @@ export class ExecutionService {
         agent.status = 'canclled';
         await this.agentExecutionRepository.save(agent);
       });
+      return {
+        success: 1,
+        message: 'worflow stopped',
+      };
     } else {
-      //we call checkAgentStatus here right?
-      const executionAgent = await this.redis.get(
-        `execution:${executionId}:hitl:agent`,
-      );
-      const agentId = executionAgent ? executionAgent : '';
+      //we call checkAgentStatus here right
+      // const executionAgent = await this.redis.get(
+      //   `execution:${executionId}:hitl:agent`,
+      // );
+      // const agentId = JSON.parse(executionAgent)[0];
+
+      await this.streamService.emit(executionId.toString(), {
+        agentId,
+        status: 'completed',
+      });
+
       await this.orchestratorService.checkAgentStatus(
         executionId.toString(),
         agentId,

@@ -5,6 +5,7 @@ import { WorkflowService } from '../workflow/workflow.service';
 import { AgentExecution } from 'src/database/entities/agent-execution.entity';
 import { OrchestratorService } from 'src/service/orchestrator/orchestrator.service';
 import { DagService } from 'src/service/dag/dag.service';
+import { StreamService } from '../stream/stream.service';
 export declare class ExecutionService {
     private readonly executionRepository;
     private readonly workflowService;
@@ -12,7 +13,8 @@ export declare class ExecutionService {
     private readonly orchestratorService;
     private readonly dagService;
     private readonly redis;
-    constructor(executionRepository: Repository<Execution>, workflowService: WorkflowService, agentExecutionRepository: Repository<AgentExecution>, orchestratorService: OrchestratorService, dagService: DagService, redis: any);
+    private readonly streamService;
+    constructor(executionRepository: Repository<Execution>, workflowService: WorkflowService, agentExecutionRepository: Repository<AgentExecution>, orchestratorService: OrchestratorService, dagService: DagService, redis: any, streamService: StreamService);
     createExecution(executiondto: createExecutionDto): Promise<{
         success: boolean;
         message: string;
@@ -63,5 +65,8 @@ export declare class ExecutionService {
             };
         };
     }>;
-    processHITL(ack: string, executionId: number): Promise<void>;
+    processHITL(ack: string, executionId: number, agentId: string): Promise<{
+        success: number;
+        message: string;
+    } | undefined>;
 }

@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
@@ -43,5 +44,16 @@ export class ExecutionController {
     @Param('executionId', ParseIntPipe) executionId: number,
   ) {
     return this.executionService.getExecution(executionId);
+  }
+
+  @Patch('/:executionId/:agentId/:status')
+  @ApiOperation({ summary: 'accept or reject the agents flow' })
+  @ApiParam({ name: 'executionId', type: Number, required: true })
+  async InterventionStatus(
+    @Param('executionId', ParseIntPipe) executionId: number,
+    @Param('agentId') agentId: string,
+    @Param('status') status: string,
+  ) {
+    return this.executionService.processHITL(status, executionId, agentId);
   }
 }

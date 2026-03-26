@@ -33,6 +33,9 @@ let ExecutionController = class ExecutionController {
     async getExecutionStatus(executionId) {
         return this.executionService.getExecution(executionId);
     }
+    async InterventionStatus(executionId, agentId, status) {
+        return this.executionService.processHITL(status, executionId, agentId);
+    }
 };
 exports.ExecutionController = ExecutionController;
 __decorate([
@@ -64,6 +67,17 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", Promise)
 ], ExecutionController.prototype, "getExecutionStatus", null);
+__decorate([
+    (0, common_1.Patch)('/:executionId/:agentId/:status'),
+    (0, swagger_1.ApiOperation)({ summary: 'accept or reject the agents flow' }),
+    (0, swagger_1.ApiParam)({ name: 'executionId', type: Number, required: true }),
+    __param(0, (0, common_1.Param)('executionId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Param)('agentId')),
+    __param(2, (0, common_1.Param)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String, String]),
+    __metadata("design:returntype", Promise)
+], ExecutionController.prototype, "InterventionStatus", null);
 exports.ExecutionController = ExecutionController = __decorate([
     (0, common_1.Controller)('execution'),
     __metadata("design:paramtypes", [execution_service_1.ExecutionService])

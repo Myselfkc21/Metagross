@@ -6,6 +6,7 @@ import { workflowGraph } from 'src/types/types';
 import Redis from 'ioredis';
 import { ExecutionService } from 'src/modules/execution/execution.service';
 import { REDIS_CLIENT, REDIS_SUBSCRIBER } from 'src/redis/redis.constants';
+import { StreamService } from 'src/modules/stream/stream.service';
 @Injectable()
 export class OrchestratorService implements OnModuleInit {
   constructor(
@@ -15,6 +16,7 @@ export class OrchestratorService implements OnModuleInit {
     private readonly executionService: ExecutionService,
     @Inject(REDIS_CLIENT) private readonly redis: Redis,
     @Inject(REDIS_SUBSCRIBER) private readonly redisSubscriber: Redis,
+    private readonly streamService: StreamService,
   ) {}
 
   onModuleInit() {
@@ -62,13 +64,20 @@ export class OrchestratorService implements OnModuleInit {
     const { dependencyMap, workflowGraph, input } = JSON.parse(
       (await this.redis.get(`execution:${executionId}:context`)) || '{}',
     );
-
+    console.log('Context in checkAgentStatus', {
+      dependencyMap,
+      workflowGraph,
+      input,
+    });
+    console.log(
+      `Agent ${agentId} completed for execution ${executionId}. Checking dependent agents...`,
+    );
     const dependentAgents = Object.keys(dependencyMap).filter((key) =>
       dependencyMap[key].includes(agentId),
     );
     console.log('Dependency', dependentAgents);
-    const humanInterventionAgents = dependentAgents.filter(
-      (agentId) => agentId === 'HITL',
+    const humanInterventionAgents = dependentAgents.filter((agentId) =>
+      agentId.toLowerCase().includes('hitl'),
     );
     console.log('HITL', humanInterventionAgents);
 
@@ -85,8 +94,18 @@ export class OrchestratorService implements OnModuleInit {
 
       await this.redis.set(
         `execution:${executionId}:hitl:agent`,
-        JSON.stringify(humanInterventionAgents),
+        JSON.stringify(humanInterventionAgents[0]),
       );
+
+      await this.executionService.updateStatus(
+        parseInt(executionId),
+        humanInterventionAgents[0],
+        'waiting',
+      );
+      await this.streamService.emit(executionId, {
+        agentId: humanInterventionAgents[0],
+        status: 'waiting',
+      });
       return {
         success: 1,
         message: 'Please approve or reject the flow',

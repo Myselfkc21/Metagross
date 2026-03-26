@@ -22,6 +22,7 @@ const agent_execution_entity_1 = require("../../database/entities/agent-executio
 const orchestrator_service_1 = require("../../service/orchestrator/orchestrator.service");
 const dag_service_1 = require("../../service/dag/dag.service");
 const redis_constants_1 = require("../../redis/redis.constants");
+const stream_service_1 = require("../stream/stream.service");
 let ExecutionService = class ExecutionService {
     executionRepository;
     workflowService;
@@ -29,13 +30,15 @@ let ExecutionService = class ExecutionService {
     orchestratorService;
     dagService;
     redis;
-    constructor(executionRepository, workflowService, agentExecutionRepository, orchestratorService, dagService, redis) {
+    streamService;
+    constructor(executionRepository, workflowService, agentExecutionRepository, orchestratorService, dagService, redis, streamService) {
         this.executionRepository = executionRepository;
         this.workflowService = workflowService;
         this.agentExecutionRepository = agentExecutionRepository;
         this.orchestratorService = orchestratorService;
         this.dagService = dagService;
         this.redis = redis;
+        this.streamService = streamService;
     }
     async createExecution(executiondto) {
         const { workflowId, input } = executiondto;
@@ -85,6 +88,7 @@ let ExecutionService = class ExecutionService {
         agent.end_time = new Date();
         agent.output = output ? output : '';
         await this.agentExecutionRepository.save(agent);
+        console.log(`Updated agent execution:`, agent);
         return {
             success: 1,
             message: 'Agent execution updated successfully',
@@ -161,8 +165,11 @@ let ExecutionService = class ExecutionService {
             },
         };
     }
-    async processHITL(ack, executionId) {
+    async processHITL(ack, executionId, agentId) {
         if (ack == 'reject') {
+            await this.streamService.emit(executionId.toString(), {
+                status: 'canclled',
+            });
             const execution = await this.executionRepository.findOneByOrFail({
                 id: executionId,
             });
@@ -175,10 +182,16 @@ let ExecutionService = class ExecutionService {
                 agent.status = 'canclled';
                 await this.agentExecutionRepository.save(agent);
             });
+            return {
+                success: 1,
+                message: 'worflow stopped',
+            };
         }
         else {
-            const executionAgent = await this.redis.get(`execution:${executionId}:hitl:agent`);
-            const agentId = executionAgent ? executionAgent : '';
+            await this.streamService.emit(executionId.toString(), {
+                agentId,
+                status: 'completed',
+            });
             await this.orchestratorService.checkAgentStatus(executionId.toString(), agentId);
         }
     }
@@ -194,6 +207,6 @@ exports.ExecutionService = ExecutionService = __decorate([
         workflow_service_1.WorkflowService,
         typeorm_2.Repository,
         orchestrator_service_1.OrchestratorService,
-        dag_service_1.DagService, Object])
+        dag_service_1.DagService, Object, stream_service_1.StreamService])
 ], ExecutionService);
 //# sourceMappingURL=execution.service.js.map
