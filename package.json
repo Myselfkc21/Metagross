@@ -33,6 +33,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.6",
     "@nestjs/typeorm": "^11.0.0",
+    "@openrouter/sdk": "^0.9.11",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.71.0",
     "config": "^4.4.1",

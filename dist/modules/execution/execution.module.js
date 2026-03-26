@@ -16,6 +16,7 @@ const workflow_module_1 = require("../workflow/workflow.module");
 const agent_execution_entity_1 = require("../../database/entities/agent-execution.entity");
 const dag_module_1 = require("../../service/dag/dag.module");
 const orchestrator_module_1 = require("../../service/orchestrator/orchestrator.module");
+const stream_module_1 = require("../stream/stream.module");
 let ExecutionModule = class ExecutionModule {
 };
 exports.ExecutionModule = ExecutionModule;
@@ -25,6 +26,7 @@ exports.ExecutionModule = ExecutionModule = __decorate([
             typeorm_1.TypeOrmModule.forFeature([execution_entity_1.Execution, agent_execution_entity_1.AgentExecution]),
             workflow_module_1.WorkflowModule,
             dag_module_1.DagModule,
+            stream_module_1.StreamModule,
             (0, common_1.forwardRef)(() => orchestrator_module_1.OrchestratorModule),
         ],
         controllers: [execution_controller_1.ExecutionController],

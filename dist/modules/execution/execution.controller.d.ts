@@ -45,4 +45,8 @@ export declare class ExecutionController {
             workflow: import("../../database/entities/workflow.entity").Workflow;
         };
     }>;
+    InterventionStatus(executionId: number, agentId: string, status: string): Promise<{
+        success: number;
+        message: string;
+    } | undefined>;
 }
