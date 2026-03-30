@@ -4,6 +4,13 @@ import { workflowGraph } from 'src/types/types';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
+export class OpenAIQuotaExceededError extends Error {
+  constructor(message = 'OpenAI credits exhausted. Please top up your account.') {
+    super(message);
+    this.name = 'OpenAIQuotaExceededError';
+  }
+}
+
 @Injectable()
 export class AgentService {
   private openai: OpenAI;
@@ -65,6 +72,15 @@ export class AgentService {
     });
   }
 
+  private isOpenAIQuotaError(error: any): boolean {
+    return (
+      error?.status === 429 &&
+      (error?.code === 'insufficient_quota' ||
+        error?.type === 'insufficient_quota' ||
+        error?.error?.code === 'insufficient_quota')
+    );
+  }
+
   async sendMessage(node: workflowGraph['nodes'][0], input: string) {
     const { prompt, type } = node;
     const messages: any[] = [
@@ -73,13 +89,21 @@ export class AgentService {
     ];
     let k = 1;
     while (true) {
-      const completion = await this.openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages,
-        tools: node.tools,
-        max_tokens: 300,
-        stream: false,
-      });
+      let completion;
+      try {
+        completion = await this.openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages,
+          tools: node.tools,
+          max_tokens: 300,
+          stream: false,
+        });
+      } catch (error) {
+        if (this.isOpenAIQuotaError(error)) {
+          throw new OpenAIQuotaExceededError();
+        }
+        throw error;
+      }
 
       const msg = completion.choices[0].message;
       // TOOL CALL

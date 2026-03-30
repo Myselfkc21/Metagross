@@ -3,7 +3,10 @@ import { Inject } from '@nestjs/common';
 import { Job } from 'bullmq';
 import Redis from 'ioredis';
 import { ExecutionService } from 'src/modules/execution/execution.service';
-import { AgentService } from 'src/service/agent/agent.service';
+import {
+  AgentService,
+  OpenAIQuotaExceededError,
+} from 'src/service/agent/agent.service';
 import { REDIS_CLIENT } from 'src/redis/redis.constants';
 import { StreamService } from 'src/modules/stream/stream.service';
 
@@ -68,6 +71,31 @@ export class AgentConsumer extends WorkerHost {
       );
       console.log('Published to agent-completed, receivers:', result);
     } catch (error) {
+      if (error instanceof OpenAIQuotaExceededError) {
+        const { executionId, agentId } = job.data;
+        const quotaMessage =
+          'OpenAI credits are exhausted. Please top up credits and retry execution.';
+
+        await this.executionService.updateStatus(
+          executionId,
+          agentId,
+          'insufficient_funds',
+          quotaMessage,
+        );
+        await this.executionService.updateExecutionStatus(executionId, 'stopped');
+
+        this.streamService.emit(executionId, {
+          agentId,
+          status: 'insufficient_funds',
+          output: quotaMessage,
+        });
+
+        console.error(
+          `Execution ${executionId} failed for agent ${agentId}: ${quotaMessage}`,
+        );
+        return;
+      }
+
       console.error('Error processing job:', error);
       throw error;
     }
